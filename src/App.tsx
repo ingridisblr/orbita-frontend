@@ -1,122 +1,127 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+// #region Importações
+import { useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { Layout } from './components/common/Layout';
+import type { NavigationItemId } from './components/common/Sidebar';
 
+import { Login } from './pages/Login';
+import { SelecionarPerfil } from './pages/SelecionarPerfil';
+
+import type { User, UserRole } from './types/auth';
+// #endregion
+
+// #region Usuários de demonstração
+const demoUsers: Record<UserRole, User> = {
+  colaborador: {
+    id:    'demo-colaborador',
+    name:  'Pedro Alves',
+    email: 'pedro.alves@example.com',
+    role:  'colaborador',
+    area:  'Administrativo',
+  },
+  gestor: {
+    id:    'demo-gestor',
+    name:  'Maria Souza',
+    email: 'maria.souza@example.com',
+    role:  'gestor',
+    area:  'Administrativa',
+  },
+  analista: {
+    id:    'demo-analista',
+    name:  'Ana Lima',
+    email: 'ana.lima@example.com',
+    role:  'analista',
+    area:  'Hub de Inovação',
+  },
+};
+// #endregion
+
+// #region Navegação
+const initialPages: Record<UserRole, NavigationItemId> = {
+  colaborador: 'desafios-abertos',
+  gestor:      'meus-desafios',
+  analista:    'painel-avaliacao',
+};
+
+const pageTitles: Record<NavigationItemId, string> = {
+  'desafios-abertos':    'Desafios Abertos',
+  'propor-ideia':        'Propor Ideia',
+  'minhas-ideias':       'Minhas Ideias',
+  'meus-desafios':       'Meus Desafios',
+  'novo-desafio':        'Novo Desafio',
+  'ideias-relacionadas': 'Ideias Relacionadas',
+  'painel-avaliacao':    'Painel de Avaliação',
+  match:                'Match Ideia × Desafio',
+  triagem:              'Triagem / Priorização',
+  kanban:               'Projetos / Kanban',
+  mvp:                  'MVP',
+  dashboard:            'Dashboard',
+  resultados:           'Resultados',
+  auditoria:            'Auditoria',
+};
+// #endregion
+
+// #region Componente
+export default function App() {
+  // #region Estado
+  const [enteredDemo, setEnteredDemo] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [activeItem, setActiveItem] =
+    useState<NavigationItemId>('desafios-abertos');
+  // #endregion
+
+  // #region Eventos
+  function handleSelectProfile(role: UserRole) {
+    setUser(demoUsers[role]);
+    setActiveItem(initialPages[role]);
+  }
+
+  function handleSwitchProfile() {
+    setUser(null);
+  }
+
+  function handleLogout() {
+    setUser(null);
+    setEnteredDemo(false);
+    setActiveItem('desafios-abertos');
+  }
+  // #endregion
+
+  // #region Login
+  if (!enteredDemo) {
+    return (
+      <Login onEnterDemo={() => setEnteredDemo(true)} />
+    );
+  }
+  // #endregion
+
+  // #region Seleção de perfil
+  if (!user) {
+    return (
+      <SelecionarPerfil
+        onSelectProfile={handleSelectProfile}
+        onBack={handleLogout}
+      />
+    );
+  }
+  // #endregion
+
+  // #region Área da aplicação
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Layout
+      user={user}
+      activeItem={activeItem}
+      onNavigate={setActiveItem}
+      onSwitchProfile={handleSwitchProfile}
+      onLogout={handleLogout}
+    >
+      <h1>{pageTitles[activeItem]}</h1>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <p>
+        O conteúdo desta página será implementado nas próximas etapas.
+      </p>
+    </Layout>
+  );
+  // #endregion
 }
-
-export default App
+// #endregion

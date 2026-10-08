@@ -1,0 +1,168 @@
+/* #region Página */
+.profile-page {
+  width:     100%;
+  max-width: var(--profile-page-max-width);
+  margin:    0 auto;
+  padding:   var(--profile-page-padding-y) var(--profile-page-padding-x);
+}
+/* #endregion */
+
+/* #region Cabeçalho */
+.profile-page__header {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            var(--profile-header-gap);
+
+  max-width: var(--profile-header-max-width);
+  margin:    0 auto;
+
+  text-align: center;
+}
+
+.profile-page__header h1 {
+  font-size: var(--profile-heading-size);
+}
+
+.profile-page__header p {
+  color:     var(--profile-description-color);
+  font-size: var(--profile-description-size);
+}
+/* #endregion */
+
+/* #region Grade */
+.profile-page__grid {
+  display:               grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:                   var(--profile-grid-gap);
+
+  margin-top: var(--profile-grid-margin-top);
+}
+/* #endregion */
+
+/* #region Cartão */
+.profile-card {
+  display:        flex;
+  flex-direction: column;
+
+  min-width:  0;
+  min-height: var(--profile-card-min-height);
+  padding:    var(--profile-card-padding);
+
+  background-color: var(--profile-card-bg);
+
+  border:        var(--profile-card-border-width) solid
+                 var(--profile-card-border);
+  border-radius: var(--profile-card-radius);
+}
+
+.profile-card__header {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--profile-card-header-gap);
+}
+
+.profile-card__header h2 {
+  color:     var(--profile-card-title-color);
+  font-size: var(--profile-card-title-size);
+}
+
+.profile-card__subtitle {
+  color:       var(--profile-card-subtitle-color);
+  font-family: var(--profile-card-subtitle-font);
+  font-size:   var(--profile-card-subtitle-size);
+}
+
+.profile-card__description {
+  min-height: var(--profile-card-description-min);
+  margin-top: var(--profile-card-gap);
+
+  color:       var(--profile-card-body-color);
+  font-size:   var(--profile-card-body-size);
+  line-height: var(--profile-card-body-height);
+}
+/* #endregion */
+
+/* #region Permissões */
+.profile-card__permissions {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--profile-card-list-gap);
+
+  margin:  var(--profile-card-gap) 0 0;
+  padding: 0;
+
+  color:       var(--profile-card-body-color);
+  font-size:   var(--profile-card-body-size);
+  line-height: var(--profile-card-body-height);
+
+  list-style: none;
+}
+
+.profile-card__permissions li {
+  display:     flex;
+  align-items: flex-start;
+  gap:         var(--profile-card-icon-gap);
+}
+
+.profile-card__permissions li > span:first-child {
+  flex-shrink: 0;
+}
+
+/* #endregion */
+
+/* #region Ação do cartão */
+.profile-card__footer {
+  margin-top: var(--profile-card-gap);
+  padding-top: var(--profile-card-gap);
+
+  border-top: var(--profile-card-border-width) solid
+              var(--profile-card-border);
+}
+
+.profile-card__enter {
+  width:           100%;
+  min-height:      var(--profile-card-action-height);
+  justify-content: center;
+
+  color:       var(--profile-card-action-color);
+  font-size:   var(--profile-card-action-size);
+  font-weight: var(--profile-card-action-weight);
+  text-align:  center;
+}
+/* #endregion */
+
+/* #region Rodapé */
+.profile-page__footer {
+  margin-top: var(--profile-footer-margin-top);
+
+  text-align: center;
+}
+
+/* #endregion */
+
+/* #region Alinhamento dos botões */
+.profile-card__more {
+  margin-bottom: var(--profile-card-gap);
+}
+
+.profile-card__footer {
+  margin-top: auto;
+}
+/* #endregion */
+
+/* #region Responsividade */
+@media (max-width: 48rem) {
+  .profile-page__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-card__description {
+    min-height: 0;
+  }
+
+  .profile-card__footer {
+    margin-top: var(--profile-card-gap);
+  }
+}
+/* #endregion */

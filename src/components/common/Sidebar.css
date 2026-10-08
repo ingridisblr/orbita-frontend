@@ -1,0 +1,189 @@
+/* #region Estrutura */
+.sidebar {
+  position: fixed;
+  inset:    0 auto 0 0;
+
+  display:        flex;
+  flex-direction: column;
+
+  width:      var(--sidebar-width);
+  overflow-y: auto;
+
+  background-color: var(--sidebar-bg);
+  color:            var(--sidebar-text);
+}
+/* #endregion */
+
+/* #region Identidade */
+.sidebar__brand {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--sidebar-brand-gap);
+
+  padding: var(--sidebar-brand-padding);
+
+  border-bottom: var(--sidebar-border-width) solid
+                 var(--sidebar-border-color);
+}
+
+.sidebar__brand-name {
+  color:       var(--sidebar-brand-text);
+  font-size:   var(--sidebar-brand-font-size);
+  font-weight: var(--sidebar-brand-font-weight);
+}
+
+.sidebar__brand-caption {
+  color:          var(--sidebar-text);
+  font-family:    var(--sidebar-caption-font-family);
+  font-size:      var(--sidebar-caption-font-size);
+  letter-spacing: var(--sidebar-caption-spacing);
+}
+/* #endregion */
+
+/* #region Navegação */
+.sidebar__navigation {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--sidebar-nav-gap);
+
+  padding: var(--sidebar-nav-padding);
+}
+
+.sidebar__link {
+  display:     flex;
+  align-items: center;
+  gap:         var(--sidebar-link-gap);
+
+  width:      100%;
+  min-height: var(--sidebar-link-min-height);
+  padding:    var(--sidebar-link-padding-y)
+              var(--sidebar-link-padding-x);
+
+  background-color: var(--sidebar-link-bg);
+  color:            var(--sidebar-text);
+
+  border:        0;
+  border-radius: var(--sidebar-link-radius);
+
+  font-size:   var(--sidebar-link-font-size);
+  line-height: var(--sidebar-link-line-height);
+  text-align:  left;
+}
+
+.sidebar__link:hover {
+  background-color: var(--sidebar-link-hover-bg);
+}
+
+.sidebar__link--active,
+.sidebar__link--active:hover {
+  background-color: var(--sidebar-active-bg);
+  color:            var(--sidebar-active-text);
+}
+
+.sidebar__icon {
+  flex-shrink: 0;
+
+  width: var(--sidebar-icon-width);
+
+  text-align: center;
+}
+/* #endregion */
+
+/* #region Usuário e sessão */
+.sidebar__footer {
+  display:        flex;
+  flex-direction: column;
+  align-items:    flex-start;
+  gap:            var(--sidebar-footer-gap);
+
+  margin-top: auto;
+  padding:    var(--sidebar-footer-padding);
+
+  border-top: var(--sidebar-border-width) solid
+              var(--sidebar-border-color);
+}
+
+.sidebar__user-name {
+  color:     var(--sidebar-user-name-color);
+  font-size: var(--sidebar-user-name-size);
+}
+
+.sidebar__user-description {
+  color:       var(--sidebar-text);
+  font-family: var(--sidebar-user-description-font);
+  font-size:   var(--sidebar-user-description-size);
+
+  overflow-wrap: anywhere;
+}
+
+.sidebar__session-action {
+  padding: var(--sidebar-session-padding-y) 0;
+
+  background-color: var(--sidebar-link-bg);
+  color:            var(--sidebar-text);
+
+  border: 0;
+
+  font-size:  var(--sidebar-session-font-size);
+  text-align: left;
+}
+
+.sidebar__session-action:hover {
+  text-decoration: underline;
+}
+/* #endregion */
+
+/* #region Menu móvel */
+.sidebar__toggle {
+  display: none;
+}
+/* #endregion */
+
+/* #region Acessibilidade */
+.sidebar button:focus-visible {
+  outline-color: var(--sidebar-focus-color);
+}
+
+.sidebar__link--active:focus-visible {
+  outline-color: var(--color-focus);
+}
+/* #endregion */
+
+/* #region Responsividade */
+@media (max-width: 48rem) {
+  .sidebar {
+    position: static;
+
+    width:      100%;
+    overflow-y: visible;
+  }
+
+  .sidebar__toggle {
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+
+    width:   100%;
+    padding: var(--sidebar-toggle-padding);
+
+    background-color: var(--sidebar-link-bg);
+    color:            var(--sidebar-text);
+
+    border: 0;
+
+    font-size: var(--sidebar-link-font-size);
+  }
+
+  .sidebar__navigation {
+    display: none;
+  }
+
+  .sidebar__navigation--expanded {
+    display: flex;
+  }
+
+  .sidebar__footer {
+    margin-top: 0;
+  }
+}
+/* #endregion */
