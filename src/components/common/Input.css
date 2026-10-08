@@ -1,0 +1,75 @@
+/* #region Organização do campo */
+.input-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--input-field-gap);
+
+  min-width: 0;
+}
+/* #endregion */
+
+/* #region Label */
+.input-field__label {
+  color:          var(--input-label-color);
+  font-family:    var(--input-font-family);
+  font-size:      var(--input-label-font-size);
+  font-weight:    var(--input-label-font-weight);
+  line-height:    var(--input-line-height);
+  letter-spacing: var(--input-label-spacing);
+  text-transform: uppercase;
+}
+/* #endregion */
+
+/* #region Campo */
+.input {
+  width:      100%;
+  min-width:  0;
+  min-height: var(--input-min-height);
+  padding:    var(--input-padding-y) var(--input-padding-x);
+
+  background-color: var(--input-bg);
+  color:            var(--input-text);
+
+  border:        var(--input-border-width) solid var(--input-border-color);
+  border-radius: var(--input-border-radius);
+
+  font-family: var(--input-font-family);
+  font-size:   var(--input-font-size);
+  line-height: var(--input-line-height);
+}
+
+.input::placeholder {
+  color:   var(--input-placeholder);
+  opacity: 1;
+}
+/* #endregion */
+
+/* #region Mensagens */
+.input-field__message {
+  color:       var(--input-message-color);
+  font-family: var(--input-font-family);
+  font-size:   var(--input-message-font-size);
+  line-height: var(--input-line-height);
+
+  overflow-wrap: anywhere;
+}
+/* #endregion */
+
+/* #region Estado de erro */
+.input--error {
+  border-color: var(--input-error-color);
+}
+
+.input-field__message--error {
+  color: var(--input-error-color);
+}
+/* #endregion */
+
+/* #region Estado desabilitado */
+.input:disabled {
+  background-color: var(--input-disabled-bg);
+  color:            var(--input-disabled-text);
+
+  cursor: not-allowed;
+}
+/* #endregion */
