@@ -8,6 +8,9 @@ import { Login } from './pages/Login';
 import { SelecionarPerfil } from './pages/SelecionarPerfil';
 
 import type { User, UserRole } from './types/auth';
+import { DesafiosAbertos } from './pages/DesafiosAbertos';
+import { ProporIdeia } from './pages/ProporIdeia';
+
 // #endregion
 
 // #region Usuários de demonstração
@@ -39,7 +42,7 @@ const demoUsers: Record<UserRole, User> = {
 // #region Navegação
 const initialPages: Record<UserRole, NavigationItemId> = {
   colaborador: 'desafios-abertos',
-  gestor:      'meus-desafios',
+  gestor:       'meus-desafios',
   analista:    'painel-avaliacao',
 };
 
@@ -115,11 +118,17 @@ export default function App() {
       onSwitchProfile={handleSwitchProfile}
       onLogout={handleLogout}
     >
-      <h1>{pageTitles[activeItem]}</h1>
+     {/* Renderização dinâmica baseada na página ativa */}
+      {activeItem === 'desafios-abertos' && <DesafiosAbertos />}
+      {activeItem === 'propor-ideia' && <ProporIdeia />}
 
-      <p>
-        O conteúdo desta página será implementado nas próximas etapas.
-      </p>
+      {/* Outras páginas serão adicionadas aqui conforme você implementar */}
+      {activeItem !== 'desafios-abertos' && activeItem !== 'propor-ideia' && (
+        <div>
+          <h1>{pageTitles[activeItem]}</h1>
+          <p>O conteúdo desta página será implementado nas próximas etapas.</p>
+        </div>
+      )}
     </Layout>
   );
   // #endregion
