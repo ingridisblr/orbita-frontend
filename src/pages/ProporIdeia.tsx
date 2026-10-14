@@ -1,63 +1,49 @@
 import { useState } from 'react';
 import './ProporIdeia.css';
 
-interface IdeiaFormState {
-  desafioId: string;
-  titulo: string;
-  resumo: string;
-  impactoEsperado: string;
-  custoEstimado: string;
-}
 export function ProporIdeia() {
-  const [formData, setFormData] = useState<IdeiaFormState>({
-    desafioId: '1',
-    titulo: '',
-    resumo: '',
-    impactoEsperado: '',
-    custoEstimado: '',
-  });
+  const [titulo, setTitulo] = useState('');
+  const [desafioId, setDesafioId] = useState('1');
+  const [descricao, setDescricao] = useState('');
+  const [beneficios, setBeneficios] = useState('');
+  const [sucesso, setSucesso] = useState(false);
 
-  const [enviando, setEnviando] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Tipagem inline direta para evitar conflitos de módulos do TypeScript
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setEnviando(true);
-
+    if (!titulo.trim() || !descricao.trim()) {
+      alert('Por favor, preencha os campos obrigatórios.');
+      return;
+    }
+    setSucesso(true);
     setTimeout(() => {
-      alert(`Ideia "${formData.titulo}" submetida com sucesso! A aguardar triagem da IA.`);
-      setEnviando(false);
-      setFormData({
-        desafioId: '1',
-        titulo: '',
-        resumo: '',
-        impactoEsperado: '',
-        custoEstimado: '',
-      });
-    }, 800);
+      setSucesso(false);
+      setTitulo('');
+      setDescricao('');
+      setBeneficios('');
+    }, 4000);
   };
 
   return (
-    <div className="propor-ideia-container">
-      <header className="propor-ideia-header">
+    <div className="propor-container">
+      <header className="propor-header">
         <h1>Propor Nova Ideia</h1>
-        <p>Apresente a sua solução inovadora para o desafio selecionado. A proposta passará por uma análise de compatibilidade semântica assistida por IA, sob rigorosa governança humana.</p>
+        <p>Apresente a sua solução inovadora para otimizar os processos e gerar valor para a organização.</p>
       </header>
 
-      <form className="propor-ideia-form" onSubmit={handleSubmit}>
+      {sucesso && (
+        <div className="propor-alert-sucesso">
+          <strong>Sucesso!</strong> A sua ideia foi submetida e enviada para triagem da equipe de inovação.
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="propor-form">
         <div className="form-group">
-          <label htmlFor="desafioId">Desafio Relacionado</label>
+          <label htmlFor="desafio">Desafio Relacionado *</label>
           <select
-            id="desafioId"
-            name="desafioId"
-            className="form-control-select"
-            value={formData.desafioId}
-            onChange={handleChange}
+            id="desafio"
+            value={desafioId}
+            onChange={(e) => setDesafioId(e.target.value)}
+            className="form-control"
           >
             <option value="1">Otimização do Fluxo de Atendimento ao Cliente no Balcão</option>
             <option value="2">Automação na Gestão de Resíduos do Hub de Inovação</option>
@@ -65,66 +51,46 @@ export function ProporIdeia() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="titulo">Título da Proposta</label>
+          <label htmlFor="titulo">Título da Proposta *</label>
           <input
-            type="text"
             id="titulo"
-            name="titulo"
-            className="form-control-input"
-            placeholder="Ex: Implementação de totem digital de triagem rápida"
-            value={formData.titulo}
-            onChange={handleChange}
+            type="text"
+            placeholder="Ex: Implementação de triagem digital via tótem"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            className="form-control"
             required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="resumo">Descrição Detalhada da Ideia</label>
+          <label htmlFor="descricao">Descrição Detalhada da Solução *</label>
           <textarea
-            id="resumo"
-            name="resumo"
-            className="form-control-textarea"
-            placeholder="Descreva como a sua solução resolve o gargalo operacional apontado no desafio..."
-            value={formData.resumo}
-            onChange={handleChange}
+            id="descricao"
+            rows={4}
+            placeholder="Explique como a sua ideia resolve o problema apontado..."
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className="form-control"
             required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="impactoEsperado">Impacto Operacional Esperado</label>
-          <input
-            type="text"
-            id="impactoEsperado"
-            name="impactoEsperado"
-            className="form-control-input"
-            placeholder="Ex: Redução estimada de 30% no tempo de espera do cliente"
-            value={formData.impactoEsperado}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="custoEstimado">Estimativa de Investimento / Esforço</label>
-          <input
-            type="text"
-            id="custoEstimado"
-            name="custoEstimado"
-            className="form-control-input"
-            placeholder="Ex: Baixo custo / Implementação em até 2 semanas"
-            value={formData.custoEstimado}
-            onChange={handleChange}
-            required
+          <label htmlFor="beneficios">Benefícios Esperados / Impacto</label>
+          <textarea
+            id="beneficios"
+            rows={3}
+            placeholder="Ex: Redução estimada de 30% no tempo de espera..."
+            value={beneficios}
+            onChange={(e) => setBeneficios(e.target.value)}
+            className="form-control"
           />
         </div>
 
         <div className="form-actions">
-          <button type="button" className="btn-cancelar" onClick={() => window.history.back()}>
-            Cancelar
-          </button>
-          <button type="submit" className="btn-submit" disabled={enviando}>
-            {enviando ? 'A submeter...' : 'Submeter Proposta'}
+          <button type="submit" className="btn-enviar-ideia">
+            Submeter Proposta
           </button>
         </div>
       </form>

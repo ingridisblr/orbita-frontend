@@ -10,6 +10,7 @@ import { SelecionarPerfil } from './pages/SelecionarPerfil';
 import type { User, UserRole } from './types/auth';
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
 import { ProporIdeia } from './pages/ProporIdeia';
+import { MinhasIdeias } from './pages/MinhasIdeias';
 
 // #endregion
 
@@ -118,12 +119,13 @@ export default function App() {
       onSwitchProfile={handleSwitchProfile}
       onLogout={handleLogout}
     >
-     {/* Renderização dinâmica baseada na página ativa */}
+      {/* Renderização dinâmica das páginas do Colaborador */}
       {activeItem === 'desafios-abertos' && <DesafiosAbertos />}
       {activeItem === 'propor-ideia' && <ProporIdeia />}
+      {activeItem === 'minhas-ideias' && <MinhasIdeias />}
 
-      {/* Outras páginas serão adicionadas aqui conforme você implementar */}
-      {activeItem !== 'desafios-abertos' && activeItem !== 'propor-ideia' && (
+      {/* Fallback apenas para páginas do menu que ainda não foram implementadas */}
+      {activeItem !== 'desafios-abertos' && activeItem !== 'propor-ideia' && activeItem !== 'minhas-ideias' && (
         <div>
           <h1>{pageTitles[activeItem]}</h1>
           <p>O conteúdo desta página será implementado nas próximas etapas.</p>
@@ -133,4 +135,3 @@ export default function App() {
   );
   // #endregion
 }
-// #endregion
