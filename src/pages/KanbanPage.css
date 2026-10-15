@@ -1,0 +1,11 @@
+.kanban { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); align-items: start; }
+.kanban__col { padding: var(--space-3); background: #e6eaf1; border-radius: var(--radius-lg); }
+.kanban__title { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-3); font-size: var(--text-md); }
+.kanban__empty { margin: 0; font-size: var(--text-sm); color: var(--color-text-muted); }
+.kanban__list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.kanban__card { display: grid; gap: var(--space-2); padding: var(--space-3); background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-card); overflow-wrap: anywhere; }
+.kanban__meta { font-size: var(--text-sm); color: var(--color-text-muted); }
+.kanban__actions { display: flex; gap: var(--space-2); }
+.kanban__actions .btn { flex: 1; padding: 0; }
+@media (max-width: 1023px) { .kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .kanban { grid-template-columns: 1fr; } }

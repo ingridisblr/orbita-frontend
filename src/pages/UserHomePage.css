@@ -1,0 +1,9 @@
+.user-home__lead { color: var(--color-text-muted); }
+.user-home__summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 var(--space-4); }
+.user-home__label { margin: 0; color: var(--color-text-muted); }
+.user-home__number { margin: 0; font-size: var(--text-2xl); font-weight: 700; }
+.user-home__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.user-home__data { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-5); margin: 0; }
+.user-home__data dt { font-weight: 600; }
+.user-home__data dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 639px) { .user-home__summary { grid-template-columns: 1fr; } }

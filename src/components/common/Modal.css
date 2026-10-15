@@ -1,0 +1,28 @@
+.modal {
+  width: min(32rem, calc(100% - var(--space-5)));
+  max-height: 90vh;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+  overflow-y: auto;
+}
+.modal::backdrop { background: rgb(7 27 51 / 55%); }
+.modal__header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.modal__title { margin: 0; font-size: var(--text-lg); }
+.modal__close {
+  flex: none;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0 0;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.modal__close:hover { background: rgb(10 37 64 / 8%); }
+.modal__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-5); }

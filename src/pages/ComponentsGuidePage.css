@@ -1,0 +1,5 @@
+.guide__lead { color: var(--color-text-muted); }
+.guide__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.guide__row--spaced { margin-top: var(--space-5); }
+.guide__stack { display: grid; gap: var(--space-3); }
+.guide__form { max-width: 480px; }

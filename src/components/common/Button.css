@@ -1,0 +1,30 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-5);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.btn--lg { min-height: 52px; font-size: var(--text-lg); }
+.btn--full { width: 100%; }
+
+.btn--primary { background: var(--color-yellow-500); color: var(--color-navy-800); }
+.btn--primary:hover:not(:disabled) { background: var(--color-yellow-600); }
+
+.btn--secondary { background: var(--color-surface); color: var(--color-navy-800); border-color: var(--color-navy-800); }
+.btn--secondary:hover:not(:disabled) { background: var(--color-bg); }
+
+.btn--ghost { background: transparent; color: var(--color-navy-800); }
+.btn--ghost:hover:not(:disabled) { background: rgb(10 37 64 / 8%); }
+
+.btn--danger { background: var(--color-danger); color: #fff; }
+.btn--danger:hover:not(:disabled) { background: #912018; }
+
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.btn[aria-busy='true'] { cursor: progress; }

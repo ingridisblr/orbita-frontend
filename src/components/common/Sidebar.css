@@ -1,0 +1,57 @@
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  max-width: 85vw;
+  padding: var(--space-4);
+  background: var(--color-navy-800);
+  color: var(--color-text-on-dark);
+  transition: transform 0.2s ease, visibility 0.2s;
+}
+.sidebar :focus-visible { outline-color: var(--color-yellow-500); }
+
+.sidebar__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5); }
+.sidebar__close {
+  display: none;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  background: transparent;
+  color: var(--color-text-on-dark);
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: 1.75rem;
+  cursor: pointer;
+}
+.sidebar__list { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+.sidebar__item {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  background: transparent;
+  color: var(--color-text-on-dark-muted);
+  border: 0;
+  border-left: 4px solid transparent;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.sidebar__item:hover { background: var(--color-navy-700); color: var(--color-text-on-dark); }
+.sidebar__item[aria-current='page'] {
+  background: var(--color-navy-700);
+  color: var(--color-text-on-dark);
+  border-left-color: var(--color-yellow-500);
+  font-weight: 600;
+}
+.sidebar__footer { margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-navy-600); }
+
+.sidebar-backdrop { display: none; }
+
+@media (max-width: 1023px) {
+  .sidebar { box-shadow: var(--shadow-overlay); transform: translateX(-100%); visibility: hidden; }
+  .sidebar[data-open='true'] { transform: none; visibility: visible; }
+  .sidebar__close { display: inline-flex; align-items: center; justify-content: center; }
+  .sidebar-backdrop[data-visible='true'] { display: block; position: fixed; inset: 0; z-index: 30; background: rgb(7 27 51 / 55%); }
+}

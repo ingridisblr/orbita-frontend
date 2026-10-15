@@ -1,0 +1,2 @@
+.status-page { max-width: 520px; margin: var(--space-8) auto; padding: var(--space-6); text-align: center; background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.status-page__code { margin: 0; font-size: 4rem; font-weight: 700; line-height: 1; color: var(--color-navy-800); }

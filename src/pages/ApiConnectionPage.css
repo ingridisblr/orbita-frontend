@@ -1,0 +1,14 @@
+.api__lead { color: var(--color-text-muted); }
+.api__card { max-width: 720px; padding: var(--space-5); background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.api__meta { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-4); margin: var(--space-4) 0; }
+.api__meta dt { font-weight: 600; }
+.api__meta dd { margin: 0; min-width: 0; }
+.api__meta code { overflow-wrap: anywhere; }
+.api__json { margin: 0; padding: var(--space-3); overflow-x: auto; background: var(--color-bg); border-radius: var(--radius-sm); }
+.api__loading { display: flex; align-items: center; gap: var(--space-2); }
+.api__card .alert { margin-bottom: var(--space-3); }
+@media (max-width: 639px) {
+  .api__card { padding: var(--space-4); }
+  .api__meta { grid-template-columns: 1fr; gap: 0; }
+  .api__meta dd { margin-bottom: var(--space-3); }
+}
