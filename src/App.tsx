@@ -11,6 +11,9 @@ import type { User, UserRole } from './types/auth';
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
 import { ProporIdeia } from './pages/ProporIdeia';
 import { MinhasIdeias } from './pages/MinhasIdeias';
+import { MeusDesafios } from './pages/MeusDesafios';
+import { NovoDesafio } from './pages/NovoDesafio';
+import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
 
 // #endregion
 
@@ -43,7 +46,7 @@ const demoUsers: Record<UserRole, User> = {
 // #region Navegação
 const initialPages: Record<UserRole, NavigationItemId> = {
   colaborador: 'desafios-abertos',
-  gestor:       'meus-desafios',
+  gestor:        'meus-desafios',
   analista:    'painel-avaliacao',
 };
 
@@ -119,13 +122,27 @@ export default function App() {
       onSwitchProfile={handleSwitchProfile}
       onLogout={handleLogout}
     >
-      {/* Renderização dinâmica das páginas do Colaborador */}
+      {/* Páginas do Colaborador */}
       {activeItem === 'desafios-abertos' && <DesafiosAbertos />}
       {activeItem === 'propor-ideia' && <ProporIdeia />}
       {activeItem === 'minhas-ideias' && <MinhasIdeias />}
 
-      {/* Fallback apenas para páginas do menu que ainda não foram implementadas */}
-      {activeItem !== 'desafios-abertos' && activeItem !== 'propor-ideia' && activeItem !== 'minhas-ideias' && (
+      {/* Páginas do Gestor */}
+      {activeItem === 'meus-desafios' && (
+        <MeusDesafios onIrParaNovoDesafio={() => setActiveItem('novo-desafio')} />
+      )}
+      {activeItem === 'novo-desafio' && (
+        <NovoDesafio onVoltar={() => setActiveItem('meus-desafios')} />
+      )}
+      {activeItem === 'ideias-relacionadas' && <IdeiasRelacionadas />}
+
+      {/* Fallback para páginas ainda não implementadas */}
+      {activeItem !== 'desafios-abertos' && 
+       activeItem !== 'propor-ideia' && 
+       activeItem !== 'minhas-ideias' && 
+       activeItem !== 'meus-desafios' && 
+       activeItem !== 'novo-desafio' &&
+       activeItem !== 'ideias-relacionadas' && (
         <div>
           <h1>{pageTitles[activeItem]}</h1>
           <p>O conteúdo desta página será implementado nas próximas etapas.</p>
