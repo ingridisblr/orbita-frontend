@@ -168,8 +168,7 @@ export function Sidebar({
           className="sidebar__session-action"
           onClick={onSwitchProfile}
         >
-          <span aria-hidden="true">⇄ </span>
-          Trocar perfil
+  
         </button>
 
         <button
