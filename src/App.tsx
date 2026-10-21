@@ -1,38 +1,30 @@
 
-import   { useState }             from 'react';
+import { useState } from 'react';
 
 // Componentes comuns
-import      { Layout }            from './components/common/Layout';
-import type { NavigationItemId }  from './components/common/Sidebar';
+import { Layout } from './components/common/Layout';
+import type { NavigationItemId } from './components/common/Sidebar';
 
-<<<<<<< Updated upstream
 // Autenticação
-import      { Login }              from './pages/Login';
-import      { SelecionarPerfil }   from './pages/SelecionarPerfil';
-=======
-import type { User, UserRole } from './types/auth';
+import { Login } from './pages/Login';
+import { SelecionarPerfil } from './pages/SelecionarPerfil';
+
+// Páginas do Colaborador
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
 import { ProporIdeia } from './pages/ProporIdeia';
 import { MinhasIdeias } from './pages/MinhasIdeias';
+
+// Páginas do Gestor
 import { MeusDesafios } from './pages/MeusDesafios';
 import { NovoDesafio } from './pages/NovoDesafio';
 import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
+
+// Página do Analista
 import CadastrarUsuario from './pages/CadastrarUsuario';
->>>>>>> Stashed changes
-
-// Páginas do Colaborador
-import      { DesafiosAbertos }    from './pages/DesafiosAbertos';
-import      { ProporIdeia }        from './pages/ProporIdeia';
-import      { MinhasIdeias }       from './pages/MinhasIdeias';
-
-// Páginas do Gestor
-import      { MeusDesafios }       from './pages/MeusDesafios';
-import      { NovoDesafio }        from './pages/NovoDesafio';
-import      { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
 
 // Tipos
-import type { User, UserRole }     from './types/auth';
-import type { Ideia }              from './types/ideia';
+import type { User, UserRole } from './types/auth';
+import type { Ideia } from './types/ideia';
 
 // Usuários de demonstração
 const demoUsers: Record<UserRole, User> = {
@@ -87,6 +79,7 @@ const paginasPorPerfil: Record<UserRole, NavigationItemId[]> = {
   analista: [
     'ideias-relacionadas',
     'painel-avaliacao',
+    'cadastrar-usuario',
     'match',
     'triagem',
     'kanban',
@@ -105,8 +98,8 @@ const pageTitles: Record<NavigationItemId, string> = {
   'meus-desafios': 'Meus Desafios',
   'novo-desafio': 'Novo Desafio',
   'ideias-relacionadas': 'Ideias Relacionadas',
-<<<<<<< Updated upstream
   'painel-avaliacao': 'Painel de Avaliação',
+  'cadastrar-usuario': 'Cadastrar Usuário',
   match: 'Match Ideia × Desafio',
   triagem: 'Triagem / Priorização',
   kanban: 'Projetos / Kanban',
@@ -114,17 +107,6 @@ const pageTitles: Record<NavigationItemId, string> = {
   dashboard: 'Dashboard',
   resultados: 'Resultados',
   auditoria: 'Auditoria',
-=======
-  'painel-avaliacao':    'Painel de Avaliação',
-  'cadastrar-usuario':   'Cadastrar Usuário',
-  match:                'Match Ideia × Desafio',
-  triagem:              'Triagem / Priorização',
-  kanban:               'Projetos / Kanban',
-  mvp:                  'MVP',
-  dashboard:            'Dashboard',
-  resultados:           'Resultados',
-  auditoria:            'Auditoria',
->>>>>>> Stashed changes
 };
 
 export default function App() {
@@ -265,7 +247,6 @@ export default function App() {
         />
       )}
 
-<<<<<<< Updated upstream
       {paginaAtual === 'novo-desafio' && (
         <NovoDesafio
           onVoltar={() =>
@@ -279,7 +260,13 @@ export default function App() {
         <IdeiasRelacionadas />
       )}
 
-      {/* Fallback para módulos ainda não implementados */}
+      {/* Página do Analista */}
+      {paginaAtual === 'cadastrar-usuario' &&
+        user.role === 'analista' && (
+          <CadastrarUsuario />
+        )}
+
+      {/* Páginas ainda não implementadas */}
       {![
         'desafios-abertos',
         'propor-ideia',
@@ -287,32 +274,15 @@ export default function App() {
         'meus-desafios',
         'novo-desafio',
         'ideias-relacionadas',
+        'cadastrar-usuario',
       ].includes(paginaAtual) && (
         <main style={{ padding: '24px' }}>
           <h1>{pageTitles[paginaAtual]}</h1>
-
           <p>
             O conteúdo deste módulo será implementado
             nas próximas etapas do ÓRBITA.
           </p>
         </main>
-=======
-      {/* Páginas do Analista */}
-      {activeItem === 'cadastrar-usuario' && user.role === 'analista' && (<CadastrarUsuario />)}
-
-      {/* Fallback para páginas ainda não implementadas */}
-      {activeItem !== 'desafios-abertos' && 
-       activeItem !== 'propor-ideia' && 
-       activeItem !== 'minhas-ideias' && 
-       activeItem !== 'meus-desafios' && 
-       activeItem !== 'novo-desafio' &&
-       activeItem !== 'ideias-relacionadas' && 
-       activeItem !== 'cadastrar-usuario' && (
-        <div>
-          <h1>{pageTitles[activeItem]}</h1>
-          <p>O conteúdo desta página será implementado nas próximas etapas.</p>
-        </div>
->>>>>>> Stashed changes
       )}
     </Layout>
   );
