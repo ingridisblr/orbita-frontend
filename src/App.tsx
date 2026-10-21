@@ -7,7 +7,7 @@ import type { NavigationItemId } from './components/common/Sidebar';
 
 // Autenticação
 import { Login } from './pages/Login';
-import { SelecionarPerfil } from './pages/SelecionarPerfil';
+import { getCurrentUser, logout } from './services/authService';
 
 // Páginas do Colaborador
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
@@ -25,33 +25,6 @@ import CadastrarUsuario from './pages/CadastrarUsuario';
 // Tipos
 import type { User, UserRole } from './types/auth';
 import type { Ideia } from './types/ideia';
-
-// Usuários de demonstração
-const demoUsers: Record<UserRole, User> = {
-  colaborador: {
-    id: 'demo-colaborador',
-    name: 'Pedro Alves',
-    email: 'pedro.alves@example.com',
-    role: 'colaborador',
-    area: 'Administrativo',
-  },
-
-  gestor: {
-    id: 'demo-gestor',
-    name: 'Maria Souza',
-    email: 'maria.souza@example.com',
-    role: 'gestor',
-    area: 'Administrativa',
-  },
-
-  analista: {
-    id: 'demo-analista',
-    name: 'Ana Lima',
-    email: 'ana.lima@example.com',
-    role: 'analista',
-    area: 'Hub de Inovação',
-  },
-};
 
 // Página inicial de cada perfil
 const initialPages: Record<UserRole, NavigationItemId> = {
@@ -110,39 +83,43 @@ const pageTitles: Record<NavigationItemId, string> = {
 };
 
 export default function App() {
-  // Estado da aplicação
-  const [enteredDemo, setEnteredDemo] = useState(false);
+  // Usuário autenticado
+  const [user, setUser] = useState<User | null>(() => getCurrentUser());
 
-  const [user, setUser] = useState<User | null>(null);
+  // Página ativa
+  const [activeItem, setActiveItem] = useState<NavigationItemId>(
+    () => {
+      const usuarioAtual = getCurrentUser();
 
-  const [activeItem, setActiveItem] =
-    useState<NavigationItemId>('desafios-abertos');
+      return usuarioAtual
+        ? initialPages[usuarioAtual.role]
+        : 'desafios-abertos';
+    }
+  );
 
   // Estado compartilhado das ideias
   const [ideias, setIdeias] = useState<Ideia[]>([]);
 
-  // Selecionar perfil de demonstração
-  function handleSelectProfile(role: UserRole) {
-    const usuarioSelecionado = demoUsers[role];
-
-    setUser(usuarioSelecionado);
-    setActiveItem(initialPages[role]);
+  // Login realizado com sucesso
+  function handleLoginSuccess(usuario: User) {
+    setUser(usuario);
+    setActiveItem(initialPages[usuario.role]);
   }
 
-  // Voltar à seleção de perfil
-  function handleSwitchProfile() {
-    setUser(null);
-    setActiveItem('desafios-abertos');
-  }
-
-  // Sair da demonstração
+  // Encerrar sessão
   function handleLogout() {
+    logout();
     setUser(null);
-    setEnteredDemo(false);
     setActiveItem('desafios-abertos');
+    setIdeias([]);
   }
 
-  // Navegação com verificação de perfil
+  // A opção de trocar perfil exige um novo login
+  function handleSwitchProfile() {
+    handleLogout();
+  }
+
+  // Navegação conforme o perfil
   function handleNavigate(item: NavigationItemId) {
     if (!user) return;
 
@@ -181,22 +158,10 @@ export default function App() {
     setActiveItem('minhas-ideias');
   }
 
-  // Tela de entrada
-  if (!enteredDemo) {
-    return (
-      <Login
-        onEnterDemo={() => setEnteredDemo(true)}
-      />
-    );
-  }
-
-  // Seleção de perfil
+  // Exibe login quando não existe usuário autenticado
   if (!user) {
     return (
-      <SelecionarPerfil
-        onSelectProfile={handleSelectProfile}
-        onBack={handleLogout}
-      />
+      <Login onLoginSuccess={handleLoginSuccess} />
     );
   }
 
@@ -227,15 +192,11 @@ export default function App() {
       )}
 
       {paginaAtual === 'propor-ideia' && (
-        <ProporIdeia
-          onSubmit={handleSubmitIdea}
-        />
+        <ProporIdeia onSubmit={handleSubmitIdea} />
       )}
 
       {paginaAtual === 'minhas-ideias' && (
-        <MinhasIdeias
-          ideias={minhasIdeias}
-        />
+        <MinhasIdeias ideias={minhasIdeias} />
       )}
 
       {/* Páginas do Gestor */}

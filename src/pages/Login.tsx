@@ -7,31 +7,49 @@ import logoOrbita from '../assets/logo-orbita-sidebside.png';
 import { Button } from '../components/common/Button';
 import { Input }  from '../components/common/Input';
 
+import { login } from '../services/authService';
+import type { User } from '../types/auth';
+
 import './Login.css';
-// #endregion
 
-// #region Tipos
+
+
 interface LoginProps {
-  onEnterDemo: () => void;
+   onLoginSuccess: (user: User) => void;
 }
-// #endregion
 
-// #region Componente
-export function Login({ onEnterDemo }: LoginProps) {
+
+export function Login({ onLoginSuccess }: LoginProps) {
   // #region Estado
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  // #endregion
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
 
-  // #region Eventos
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
 
-    onEnterDemo();
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  if (carregando) return;
+
+  setErro('');
+  setCarregando(true);
+
+  try {
+    const usuario = await login(email, password);
+    onLoginSuccess(usuario);
+  } catch (error) {
+    setErro(
+      error instanceof Error
+        ? error.message
+        : 'Não foi possível realizar o login.'
+    );
+  } finally {
+    setCarregando(false);
   }
-  // #endregion
+}
 
-  // #region Renderização
+ 
   return (
     <main className="login">
       {/* #region Apresentação */}
@@ -91,13 +109,14 @@ export function Login({ onEnterDemo }: LoginProps) {
             />
 
             <Button type="submit" className="login__submit">
-              Entrar
+              {carregando ? 'Entrando...' : 'Entrar'}
             </Button>
 
-            <p className="login__demo-notice">
-              Demonstração: utilize dados fictícios. Nenhuma
-              credencial será enviada ou armazenada.
+            {erro && (
+              <p role="alert" style={{ color: '#C62828', fontSize: '13px' }}>
+            {erro}
             </p>
+              )}
           </form>
 
           <p className="login__help">
@@ -108,6 +127,5 @@ export function Login({ onEnterDemo }: LoginProps) {
       {/* #endregion */}
     </main>
   );
-  // #endregion
+  
 }
-// #endregion

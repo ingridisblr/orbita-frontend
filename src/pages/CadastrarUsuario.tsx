@@ -1,5 +1,6 @@
 
 import { useState, type FormEvent, type CSSProperties } from 'react';
+import { cadastrarUsuario } from '../services/authService';
 
 type Perfil = 'colaborador' | 'gestor' | 'analista';
 
@@ -29,11 +30,50 @@ export default function CadastrarUsuario() {
   const [senha, setSenha] = useState('');
   const [area, setArea] = useState('');
   const [perfil, setPerfil] = useState<Perfil>('colaborador');
-  const [mensagem, setMensagem] = useState('');
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
+
+  function limparFormulario() {
+    setNome('');
+    setEmail('');
+    setSenha('');
+    setArea('');
+    setPerfil('colaborador');
+    setMensagem('');
+    setErro('');
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMensagem('Formulário validado. Integração com o backend pendente.');
+
+    if (carregando) return;
+
+    setCarregando(true);
+    setMensagem('');
+    setErro('');
+
+    try {
+      await cadastrarUsuario({
+        nome: nome.trim(),
+        email: email.trim(),
+        senha,
+        area: area.trim(),
+        perfil,
+      });
+
+      limparFormulario();
+      setMensagem('Usuário cadastrado com sucesso!');
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível cadastrar o usuário.'
+      );
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
@@ -89,6 +129,7 @@ export default function CadastrarUsuario() {
           >
             Informações do usuário
           </h2>
+
           <p
             style={{
               fontSize: '13px',
@@ -102,10 +143,16 @@ export default function CadastrarUsuario() {
 
         <form
           onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '22px',
+          }}
         >
           <div>
-            <label htmlFor="nome" style={labelStyle}>Nome completo *</label>
+            <label htmlFor="nome" style={labelStyle}>
+              Nome completo *
+            </label>
             <input
               id="nome"
               type="text"
@@ -118,7 +165,9 @@ export default function CadastrarUsuario() {
           </div>
 
           <div>
-            <label htmlFor="email" style={labelStyle}>E-mail *</label>
+            <label htmlFor="email" style={labelStyle}>
+              E-mail *
+            </label>
             <input
               id="email"
               type="email"
@@ -131,7 +180,9 @@ export default function CadastrarUsuario() {
           </div>
 
           <div>
-            <label htmlFor="senha" style={labelStyle}>Senha inicial *</label>
+            <label htmlFor="senha" style={labelStyle}>
+              Senha inicial *
+            </label>
             <input
               id="senha"
               type="password"
@@ -145,7 +196,9 @@ export default function CadastrarUsuario() {
           </div>
 
           <div>
-            <label htmlFor="area" style={labelStyle}>Área</label>
+            <label htmlFor="area" style={labelStyle}>
+              Área
+            </label>
             <input
               id="area"
               type="text"
@@ -157,11 +210,15 @@ export default function CadastrarUsuario() {
           </div>
 
           <div>
-            <label htmlFor="perfil" style={labelStyle}>Perfil de acesso *</label>
+            <label htmlFor="perfil" style={labelStyle}>
+              Perfil de acesso *
+            </label>
             <select
               id="perfil"
               value={perfil}
-              onChange={(e) => setPerfil(e.target.value as Perfil)}
+              onChange={(e) =>
+                setPerfil(e.target.value as Perfil)
+              }
               style={inputStyle}
               required
             >
@@ -185,14 +242,8 @@ export default function CadastrarUsuario() {
           >
             <button
               type="button"
-              onClick={() => {
-                setNome('');
-                setEmail('');
-                setSenha('');
-                setArea('');
-                setPerfil('colaborador');
-                setMensagem('');
-              }}
+              disabled={carregando}
+              onClick={limparFormulario}
               style={{
                 padding: '11px 20px',
                 backgroundColor: '#FFFFFF',
@@ -209,6 +260,7 @@ export default function CadastrarUsuario() {
 
             <button
               type="submit"
+              disabled={carregando}
               style={{
                 padding: '12px 22px',
                 backgroundColor: '#F9D928',
@@ -217,16 +269,37 @@ export default function CadastrarUsuario() {
                 borderRadius: '9px',
                 fontSize: '14px',
                 fontWeight: 700,
-                cursor: 'pointer',
+                cursor: carregando ? 'not-allowed' : 'pointer',
+                opacity: carregando ? 0.65 : 1,
               }}
             >
-              Cadastrar usuário
+              {carregando ? 'Cadastrando...' : 'Cadastrar usuário'}
             </button>
           </div>
 
           {mensagem && (
-            <p role="status" style={{ fontSize: '13px', color: '#52627A' }}>
+            <p
+              role="status"
+              style={{
+                fontSize: '13px',
+                color: '#287D46',
+                margin: 0,
+              }}
+            >
               {mensagem}
+            </p>
+          )}
+
+          {erro && (
+            <p
+              role="alert"
+              style={{
+                fontSize: '13px',
+                color: '#C62828',
+                margin: 0,
+              }}
+            >
+              {erro}
             </p>
           )}
         </form>

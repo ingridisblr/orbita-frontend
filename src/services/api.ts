@@ -1,18 +1,35 @@
-const API_URL = import.meta.env.VITE_API_URL;
 
-console.log('URL da API:', API_URL);
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const resposta = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  const token = localStorage.getItem('orbita.token');
+
+  const headers = new Headers(options.headers);
+
+  if (!headers.has('Content-Type') && options.body) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  let resposta: Response;
+
+  try {
+    resposta = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      'Não foi possível conectar ao backend. Verifique se o servidor está rodando.'
+    );
+  }
 
   const resultado = await resposta.json().catch(() => null);
 
