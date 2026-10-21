@@ -1,27 +1,298 @@
-.propor-container {
-  padding: 20px;
-  max-width: 700px;
+
+.propor-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: 8px 40px 32px;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.form-group {
-  margin-bottom: 16px;
+.propor-page *,
+.propor-page *::before,
+.propor-page *::after {
+  box-sizing: border-box;
+}
+
+.propor-voltar {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #8190a8;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.propor-voltar:hover {
+  color: #334155;
+}
+
+.propor-page-header {
+  margin-bottom: 30px;
+}
+
+.propor-page-header h1 {
+  margin: 0 0 6px;
+  color: #080808;
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -0.7px;
+}
+
+.propor-page-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.propor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.propor-form-card,
+.propor-dicas {
+  min-width: 0;
+  border: 1px solid #dfe3e8;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.propor-form-card {
+  padding: 20px;
+}
+
+.propor-campo {
   display: flex;
+  min-width: 0;
   flex-direction: column;
+  gap: 7px;
+  margin-bottom: 16px;
 }
 
-.form-control {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  margin-top: 6px;
+.propor-campo label,
+.propor-label-linha label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.45px;
+  text-transform: uppercase;
 }
 
-.btn-enviar-ideia {
-  padding: 10px 20px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
+.propor-campo input,
+.propor-campo select,
+.propor-campo textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #dce1e8;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.propor-campo input,
+.propor-campo select {
+  height: 39px;
+  padding: 0 12px;
+}
+
+.propor-campo textarea {
+  min-height: 58px;
+  padding: 11px 12px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.propor-campo input::placeholder,
+.propor-campo textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.propor-campo input:focus,
+.propor-campo select:focus,
+.propor-campo textarea:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 2px rgb(148 163 184 / 15%);
+}
+
+.propor-label-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.propor-ia-button {
+  padding: 5px 9px;
+  border: 1px solid #dce1e8;
+  border-radius: 4px;
+  background: #fff;
+  color: #64748b;
+  font-size: 12px;
   cursor: pointer;
+}
+
+.propor-ia-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.propor-campos-duplos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.propor-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.propor-cancelar,
+.propor-enviar {
+  min-height: 39px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.propor-cancelar {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #111827;
+}
+
+.propor-cancelar:hover {
+  background: #f8fafc;
+}
+
+.propor-enviar {
+  border: 1px solid #efa900;
+  background: #f5ad00;
+  color: #111827;
+}
+
+.propor-enviar:hover {
+  background: #e9a000;
+}
+
+.propor-cancelar:disabled,
+.propor-enviar:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.propor-dicas {
+  padding: 16px;
+}
+
+.propor-dicas h2 {
+  margin: 0 0 12px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.propor-dicas p {
+  margin: 0 0 12px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.propor-dicas p strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.propor-proximas-etapas {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f3;
+}
+
+.propor-proximas-etapas h3 {
+  margin: 0 0 12px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.propor-proximas-etapas ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.propor-proximas-etapas li {
+  padding-left: 4px;
+  margin-bottom: 9px;
+}
+
+.propor-proximas-etapas li::marker {
+  color: #cbd5e1;
+}
+
+.propor-sucesso {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .propor-page {
+    padding: 16px 24px 28px;
+  }
+
+  .propor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .propor-dicas {
+    order: 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .propor-page {
+    padding: 16px;
+  }
+
+  .propor-form-card {
+    padding: 16px;
+  }
+
+  .propor-campos-duplos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .propor-label-linha {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .propor-acoes {
+    flex-wrap: wrap;
+  }
 }

@@ -1,52 +1,75 @@
-import { useState } from 'react';
+
+import type { Ideia } from '../types/ideia';
 import './MinhasIdeias.css';
 
-interface IdeiaSubmetida {
-  id: string;
-  titulo: string;
-  desafio: string;
-  data: string;
-  status: 'Em Triagem' | 'Aprovada' | 'Em Desenvolvimento' | 'Arquivada';
+interface MinhasIdeiasProps {
+  ideias: Ideia[];
 }
 
-const minhasIdeiasIniciais: IdeiaSubmetida[] = [
-  {
-    id: '101',
-    titulo: 'Aplicativo de Autoatendimento Rápido',
-    desafio: 'Otimização do Fluxo de Atendimento ao Cliente no Balcão',
-    data: '12/10/2026',
-    status: 'Em Triagem',
-  },
-];
-
-export function MinhasIdeias() {
-  const [ideias] = useState<IdeiaSubmetida[]>(minhasIdeiasIniciais);
-
+export function MinhasIdeias({ ideias }: MinhasIdeiasProps) {
   return (
-    <div className="minhas-ideias-container">
+    <main className="minhas-ideias-container">
       <header className="minhas-ideias-header">
-        <h1>Minhas Ideias Submetidas</h1>
-        <p>Acompanhe o andamento das propostas enviadas por você e verifique o feedback dos avaliadores.</p>
+        <h1>Minhas Ideias</h1>
+        <p>Ideias que você submeteu ao sistema</p>
       </header>
 
-      <div className="ideias-list">
+      <section className="ideias-list" aria-label="Lista de ideias">
         {ideias.length === 0 ? (
-          <p className="ideias-empty">Você ainda não submeteu nenhuma ideia.</p>
+          <p className="ideias-empty">
+            Você ainda não submeteu nenhuma ideia.
+          </p>
         ) : (
           ideias.map((ideia) => (
-            <div key={ideia.id} className="ideia-card">
-              <div className="ideia-card-info">
-                <span className={`status-badge ${ideia.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {ideia.status}
-                </span>
-                <span className="ideia-data">Submetida em: {ideia.data}</span>
+            <article key={ideia.id} className="ideia-card">
+              <div className="ideia-card-topo">
+                <div className="ideia-identificacao">
+                  <div className="ideia-status-linha">
+                    <span className="ideia-id">
+                      IDA-{ideia.id.slice(0, 8)}
+                    </span>
+
+                    <span
+                      className={`status-badge status-${ideia.status
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')}`}
+                    >
+                      {ideia.status}
+                    </span>
+                  </div>
+
+                  <h2>{ideia.titulo}</h2>
+                </div>
               </div>
-              <h3>{ideia.titulo}</h3>
-              <p className="ideia-desafio"><strong>Desafio:</strong> {ideia.desafio}</p>
-            </div>
+
+              <p className="ideia-descricao">{ideia.descricao}</p>
+
+              {ideia.beneficioEsperado && (
+                <p className="ideia-descricao">
+                  <strong>Benefício esperado: </strong>
+                  {ideia.beneficioEsperado}
+                </p>
+              )}
+
+              <div className="ideia-card-rodape">
+                {ideia.categoria && (
+                  <span className="ideia-categoria">
+                    {ideia.categoria}
+                  </span>
+                )}
+
+                <span className="ideia-desafio">
+                  Desafio: {ideia.desafioId}
+                </span>
+
+                <span className="ideia-desafio">
+                  Submetida em: {ideia.data}
+                </span>
+              </div>
+            </article>
           ))
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
