@@ -1,11 +1,11 @@
-// #region Importações
+
 import { useState } from 'react';
 import type { User } from '../../types/auth';
 import logoOrbita from '../../assets/logo-orbita-sidebar.png';
 import './Sidebar.css';
-// #endregion
 
-// #region Tipos
+
+
 export type NavigationItemId =
   | 'desafios-abertos'
   | 'propor-ideia'
@@ -20,7 +20,8 @@ export type NavigationItemId =
   | 'mvp'
   | 'dashboard'
   | 'resultados'
-  | 'auditoria';
+  | 'auditoria'
+  | 'cadastrar-usuario';
 
 interface NavigationItem {
   id: NavigationItemId;
@@ -58,6 +59,7 @@ const menus: Record<User['role'], NavigationItem[]> = {
     { id: 'dashboard',        label: 'Dashboard',             icon: '▣' },
     { id: 'resultados',       label: 'Resultados',            icon: '◐' },
     { id: 'auditoria',        label: 'Auditoria',             icon: '⬡' },
+    { id: 'cadastrar-usuario', label: 'Cadastrar Usuário', icon: '+' },
   ],
 };
 

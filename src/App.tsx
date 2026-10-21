@@ -5,9 +5,20 @@ import   { useState }             from 'react';
 import      { Layout }            from './components/common/Layout';
 import type { NavigationItemId }  from './components/common/Sidebar';
 
+<<<<<<< Updated upstream
 // Autenticação
 import      { Login }              from './pages/Login';
 import      { SelecionarPerfil }   from './pages/SelecionarPerfil';
+=======
+import type { User, UserRole } from './types/auth';
+import { DesafiosAbertos } from './pages/DesafiosAbertos';
+import { ProporIdeia } from './pages/ProporIdeia';
+import { MinhasIdeias } from './pages/MinhasIdeias';
+import { MeusDesafios } from './pages/MeusDesafios';
+import { NovoDesafio } from './pages/NovoDesafio';
+import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
+import CadastrarUsuario from './pages/CadastrarUsuario';
+>>>>>>> Stashed changes
 
 // Páginas do Colaborador
 import      { DesafiosAbertos }    from './pages/DesafiosAbertos';
@@ -94,6 +105,7 @@ const pageTitles: Record<NavigationItemId, string> = {
   'meus-desafios': 'Meus Desafios',
   'novo-desafio': 'Novo Desafio',
   'ideias-relacionadas': 'Ideias Relacionadas',
+<<<<<<< Updated upstream
   'painel-avaliacao': 'Painel de Avaliação',
   match: 'Match Ideia × Desafio',
   triagem: 'Triagem / Priorização',
@@ -102,6 +114,17 @@ const pageTitles: Record<NavigationItemId, string> = {
   dashboard: 'Dashboard',
   resultados: 'Resultados',
   auditoria: 'Auditoria',
+=======
+  'painel-avaliacao':    'Painel de Avaliação',
+  'cadastrar-usuario':   'Cadastrar Usuário',
+  match:                'Match Ideia × Desafio',
+  triagem:              'Triagem / Priorização',
+  kanban:               'Projetos / Kanban',
+  mvp:                  'MVP',
+  dashboard:            'Dashboard',
+  resultados:           'Resultados',
+  auditoria:            'Auditoria',
+>>>>>>> Stashed changes
 };
 
 export default function App() {
@@ -242,6 +265,7 @@ export default function App() {
         />
       )}
 
+<<<<<<< Updated upstream
       {paginaAtual === 'novo-desafio' && (
         <NovoDesafio
           onVoltar={() =>
@@ -272,6 +296,23 @@ export default function App() {
             nas próximas etapas do ÓRBITA.
           </p>
         </main>
+=======
+      {/* Páginas do Analista */}
+      {activeItem === 'cadastrar-usuario' && user.role === 'analista' && (<CadastrarUsuario />)}
+
+      {/* Fallback para páginas ainda não implementadas */}
+      {activeItem !== 'desafios-abertos' && 
+       activeItem !== 'propor-ideia' && 
+       activeItem !== 'minhas-ideias' && 
+       activeItem !== 'meus-desafios' && 
+       activeItem !== 'novo-desafio' &&
+       activeItem !== 'ideias-relacionadas' && 
+       activeItem !== 'cadastrar-usuario' && (
+        <div>
+          <h1>{pageTitles[activeItem]}</h1>
+          <p>O conteúdo desta página será implementado nas próximas etapas.</p>
+        </div>
+>>>>>>> Stashed changes
       )}
     </Layout>
   );
