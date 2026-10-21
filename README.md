@@ -76,7 +76,7 @@ A aplicação atende a três perfis com permissões específicas:
 1. **Clonar o repositório:**
 
 ```
-git clone https://github.com/seu-usuario/orbita-frontend.git
+git clone https://github.com/ingridisblr/orbita-frontend.git
 cd orbita-frontend
 
 ```

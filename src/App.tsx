@@ -1,122 +1,278 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import   { useState }             from 'react';
 
+// Componentes comuns
+import      { Layout }            from './components/common/Layout';
+import type { NavigationItemId }  from './components/common/Sidebar';
+
+// Autenticação
+import      { Login }              from './pages/Login';
+import      { SelecionarPerfil }   from './pages/SelecionarPerfil';
+
+// Páginas do Colaborador
+import      { DesafiosAbertos }    from './pages/DesafiosAbertos';
+import      { ProporIdeia }        from './pages/ProporIdeia';
+import      { MinhasIdeias }       from './pages/MinhasIdeias';
+
+// Páginas do Gestor
+import      { MeusDesafios }       from './pages/MeusDesafios';
+import      { NovoDesafio }        from './pages/NovoDesafio';
+import      { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
+
+// Tipos
+import type { User, UserRole }     from './types/auth';
+import type { Ideia }              from './types/ideia';
+
+// Usuários de demonstração
+const demoUsers: Record<UserRole, User> = {
+  colaborador: {
+    id: 'demo-colaborador',
+    name: 'Pedro Alves',
+    email: 'pedro.alves@example.com',
+    role: 'colaborador',
+    area: 'Administrativo',
+  },
+
+  gestor: {
+    id: 'demo-gestor',
+    name: 'Maria Souza',
+    email: 'maria.souza@example.com',
+    role: 'gestor',
+    area: 'Administrativa',
+  },
+
+  analista: {
+    id: 'demo-analista',
+    name: 'Ana Lima',
+    email: 'ana.lima@example.com',
+    role: 'analista',
+    area: 'Hub de Inovação',
+  },
+};
+
+// Página inicial de cada perfil
+const initialPages: Record<UserRole, NavigationItemId> = {
+  colaborador: 'desafios-abertos',
+  gestor: 'meus-desafios',
+  analista: 'painel-avaliacao',
+};
+
+// Páginas permitidas para cada perfil
+const paginasPorPerfil: Record<UserRole, NavigationItemId[]> = {
+  colaborador: [
+    'desafios-abertos',
+    'propor-ideia',
+    'minhas-ideias',
+  ],
+
+  gestor: [
+    'meus-desafios',
+    'novo-desafio',
+    'ideias-relacionadas',
+    'dashboard',
+    'resultados',
+  ],
+
+  analista: [
+    'ideias-relacionadas',
+    'painel-avaliacao',
+    'match',
+    'triagem',
+    'kanban',
+    'mvp',
+    'dashboard',
+    'resultados',
+    'auditoria',
+  ],
+};
+
+// Títulos das páginas
+const pageTitles: Record<NavigationItemId, string> = {
+  'desafios-abertos': 'Desafios Abertos',
+  'propor-ideia': 'Propor Ideia',
+  'minhas-ideias': 'Minhas Ideias',
+  'meus-desafios': 'Meus Desafios',
+  'novo-desafio': 'Novo Desafio',
+  'ideias-relacionadas': 'Ideias Relacionadas',
+  'painel-avaliacao': 'Painel de Avaliação',
+  match: 'Match Ideia × Desafio',
+  triagem: 'Triagem / Priorização',
+  kanban: 'Projetos / Kanban',
+  mvp: 'MVP',
+  dashboard: 'Dashboard',
+  resultados: 'Resultados',
+  auditoria: 'Auditoria',
+};
+
+export default function App() {
+  // Estado da aplicação
+  const [enteredDemo, setEnteredDemo] = useState(false);
+
+  const [user, setUser] = useState<User | null>(null);
+
+  const [activeItem, setActiveItem] =
+    useState<NavigationItemId>('desafios-abertos');
+
+  // Estado compartilhado das ideias
+  const [ideias, setIdeias] = useState<Ideia[]>([]);
+
+  // Selecionar perfil de demonstração
+  function handleSelectProfile(role: UserRole) {
+    const usuarioSelecionado = demoUsers[role];
+
+    setUser(usuarioSelecionado);
+    setActiveItem(initialPages[role]);
+  }
+
+  // Voltar à seleção de perfil
+  function handleSwitchProfile() {
+    setUser(null);
+    setActiveItem('desafios-abertos');
+  }
+
+  // Sair da demonstração
+  function handleLogout() {
+    setUser(null);
+    setEnteredDemo(false);
+    setActiveItem('desafios-abertos');
+  }
+
+  // Navegação com verificação de perfil
+  function handleNavigate(item: NavigationItemId) {
+    if (!user) return;
+
+    const paginasPermitidas = paginasPorPerfil[user.role];
+
+    if (paginasPermitidas.includes(item)) {
+      setActiveItem(item);
+    }
+  }
+
+  // Cadastrar uma ideia enviada pelo formulário
+  function handleSubmitIdea(
+    novaIdeia: Omit<
+      Ideia,
+      'id' | 'status' | 'data' | 'usuarioId'
+    >
+  ) {
+    if (!user || user.role !== 'colaborador') {
+      return;
+    }
+
+    const ideiaCompleta: Ideia = {
+      ...novaIdeia,
+      id: crypto.randomUUID(),
+      status: 'Submetida',
+      data: new Date().toLocaleDateString('pt-BR'),
+      usuarioId: user.id,
+    };
+
+    setIdeias((ideiasAnteriores) => [
+      ...ideiasAnteriores,
+      ideiaCompleta,
+    ]);
+
+    // Após o cadastro, abre a listagem
+    setActiveItem('minhas-ideias');
+  }
+
+  // Tela de entrada
+  if (!enteredDemo) {
+    return (
+      <Login
+        onEnterDemo={() => setEnteredDemo(true)}
+      />
+    );
+  }
+
+  // Seleção de perfil
+  if (!user) {
+    return (
+      <SelecionarPerfil
+        onSelectProfile={handleSelectProfile}
+        onBack={handleLogout}
+      />
+    );
+  }
+
+  // Garante que a página atual pertence ao perfil
+  const paginasPermitidas = paginasPorPerfil[user.role];
+
+  const paginaAtual = paginasPermitidas.includes(activeItem)
+    ? activeItem
+    : initialPages[user.role];
+
+  // Exibe somente as ideias do usuário atual
+  const minhasIdeias = ideias.filter(
+    (ideia) => ideia.usuarioId === user.id
+  );
+
+  // Área principal da aplicação
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
+    <Layout
+      user={user}
+      activeItem={paginaAtual}
+      onNavigate={handleNavigate}
+      onSwitchProfile={handleSwitchProfile}
+      onLogout={handleLogout}
+    >
+      {/* Páginas do Colaborador */}
+      {paginaAtual === 'desafios-abertos' && (
+        <DesafiosAbertos />
+      )}
+
+      {paginaAtual === 'propor-ideia' && (
+        <ProporIdeia
+          onSubmit={handleSubmitIdea}
+        />
+      )}
+
+      {paginaAtual === 'minhas-ideias' && (
+        <MinhasIdeias
+          ideias={minhasIdeias}
+        />
+      )}
+
+      {/* Páginas do Gestor */}
+      {paginaAtual === 'meus-desafios' && (
+        <MeusDesafios
+          onIrParaNovoDesafio={() =>
+            handleNavigate('novo-desafio')
+          }
+        />
+      )}
+
+      {paginaAtual === 'novo-desafio' && (
+        <NovoDesafio
+          onVoltar={() =>
+            handleNavigate('meus-desafios')
+          }
+        />
+      )}
+
+      {/* Página compartilhada entre Gestor e Analista */}
+      {paginaAtual === 'ideias-relacionadas' && (
+        <IdeiasRelacionadas />
+      )}
+
+      {/* Fallback para módulos ainda não implementados */}
+      {![
+        'desafios-abertos',
+        'propor-ideia',
+        'minhas-ideias',
+        'meus-desafios',
+        'novo-desafio',
+        'ideias-relacionadas',
+      ].includes(paginaAtual) && (
+        <main style={{ padding: '24px' }}>
+          <h1>{pageTitles[paginaAtual]}</h1>
+
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            O conteúdo deste módulo será implementado
+            nas próximas etapas do ÓRBITA.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        </main>
+      )}
+    </Layout>
+  );
 }
-
-export default App

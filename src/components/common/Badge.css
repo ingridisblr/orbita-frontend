@@ -1,0 +1,49 @@
+/* #region Base */
+.badge {
+  display:        inline-flex;
+  align-items:    center;
+  vertical-align: middle;
+
+  max-width: 100%;
+  padding:   var(--badge-padding-y) var(--badge-padding-x);
+
+  border:        var(--badge-border-width) solid transparent;
+  border-radius: var(--badge-border-radius);
+
+  font-family: var(--badge-font-family);
+  font-size:   var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  line-height: var(--badge-line-height);
+
+  overflow-wrap: anywhere;
+}
+/* #endregion */
+
+/* #region Variante neutra */
+.badge--neutral {
+  background-color: var(--badge-neutral-bg);
+  color:            var(--badge-neutral-text);
+}
+/* #endregion */
+
+/* #region Variante com borda */
+.badge--outlined {
+  background-color: var(--badge-outlined-bg);
+  color:            var(--badge-outlined-text);
+  border-color:     var(--badge-outlined-border);
+}
+/* #endregion */
+
+/* #region Variante escura */
+.badge--dark {
+  background-color: var(--badge-dark-bg);
+  color:            var(--badge-dark-text);
+}
+/* #endregion */
+
+/* #region Variante principal */
+.badge--primary {
+  background-color: var(--badge-primary-bg);
+  color:            var(--badge-primary-text);
+}
+/* #endregion */
