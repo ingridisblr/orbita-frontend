@@ -1,6 +1,6 @@
 
 import type { Ideia } from '../types/ideia';
-import './MinhasIdeias.css';
+import                     './MinhasIdeias.css';
 
 interface MinhasIdeiasProps {
   ideias: Ideia[];
