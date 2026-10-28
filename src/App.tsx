@@ -25,6 +25,7 @@ import CadastrarUsuario from './pages/CadastrarUsuario';
 // Tipos
 import type { User, UserRole } from './types/auth';
 import type { Ideia } from './types/ideia';
+import { cadastrarIdeia } from './services/ideiaService';
 
 // Página inicial de cada perfil
 const initialPages: Record<UserRole, NavigationItemId> = {
@@ -97,8 +98,7 @@ export default function App() {
     }
   );
 
-  // Estado compartilhado das ideias
-  const [ideias, setIdeias] = useState<Ideia[]>([]);
+  const [desafioSelecionadoId, setDesafioSelecionadoId] = useState('');
 
   // Login realizado com sucesso
   function handleLoginSuccess(usuario: User) {
@@ -111,7 +111,7 @@ export default function App() {
     logout();
     setUser(null);
     setActiveItem('desafios-abertos');
-    setIdeias([]);
+    setDesafioSelecionadoId('');
   }
 
   // A opção de trocar perfil exige um novo login
@@ -130,31 +130,21 @@ export default function App() {
     }
   }
 
-  // Cadastrar uma ideia enviada pelo formulário
-  function handleSubmitIdea(
-    novaIdeia: Omit<
-      Ideia,
-      'id' | 'status' | 'data' | 'usuarioId'
-    >
+  // Cadastrar a ideia no backend com o token do usuário autenticado
+  async function handleSubmitIdea(
+    novaIdeia: Omit<Ideia, 'id' | 'codigo' | 'status' | 'data' | 'usuarioId'>
   ) {
     if (!user || user.role !== 'colaborador') {
-      return;
+      throw new Error('Apenas colaboradores podem cadastrar ideias.');
     }
 
-    const ideiaCompleta: Ideia = {
-      ...novaIdeia,
-      id: crypto.randomUUID(),
-      status: 'Submetida',
-      data: new Date().toLocaleDateString('pt-BR'),
-      usuarioId: user.id,
-    };
+    const idDesafio = Number(novaIdeia.desafioId);
+    await cadastrarIdeia({
+      id_desafio: Number.isNaN(idDesafio) ? novaIdeia.desafioId : idDesafio,
+      titulo: novaIdeia.titulo,
+      descricao: novaIdeia.descricao,
+    });
 
-    setIdeias((ideiasAnteriores) => [
-      ...ideiasAnteriores,
-      ideiaCompleta,
-    ]);
-
-    // Após o cadastro, abre a listagem
     setActiveItem('minhas-ideias');
   }
 
@@ -172,11 +162,6 @@ export default function App() {
     ? activeItem
     : initialPages[user.role];
 
-  // Exibe somente as ideias do usuário atual
-  const minhasIdeias = ideias.filter(
-    (ideia) => ideia.usuarioId === user.id
-  );
-
   // Área principal da aplicação
   return (
     <Layout
@@ -188,28 +173,34 @@ export default function App() {
     >
       {/* Páginas do Colaborador */}
       {paginaAtual === 'desafios-abertos' && (
-        <DesafiosAbertos />
+        <DesafiosAbertos onProporIdeia={(id) => {
+          setDesafioSelecionadoId(id);
+          handleNavigate('propor-ideia');
+        }} />
       )}
 
       {paginaAtual === 'propor-ideia' && (
-        <ProporIdeia onSubmit={handleSubmitIdea} />
+        <ProporIdeia onSubmit={handleSubmitIdea} desafioIdInicial={desafioSelecionadoId} onVoltar={() => handleNavigate('desafios-abertos')} />
       )}
 
       {paginaAtual === 'minhas-ideias' && (
-        <MinhasIdeias ideias={minhasIdeias} />
+        <MinhasIdeias />
       )}
 
       {/* Páginas do Gestor */}
       {paginaAtual === 'meus-desafios' && (
         <MeusDesafios
-          onIrParaNovoDesafio={() =>
-            handleNavigate('novo-desafio')
-          }
+          onIrParaNovoDesafio={() => handleNavigate('novo-desafio')}
+          onIrParaIdeias={(id) => {
+            setDesafioSelecionadoId(id);
+            handleNavigate('ideias-relacionadas');
+          }}
         />
       )}
 
       {paginaAtual === 'novo-desafio' && (
         <NovoDesafio
+          email={user.email}
           onVoltar={() =>
             handleNavigate('meus-desafios')
           }
@@ -218,7 +209,7 @@ export default function App() {
 
       {/* Página compartilhada entre Gestor e Analista */}
       {paginaAtual === 'ideias-relacionadas' && (
-        <IdeiasRelacionadas />
+        <IdeiasRelacionadas desafioId={desafioSelecionadoId} onVoltarParaMeusDesafios={() => handleNavigate('meus-desafios')} />
       )}
 
       {/* Página do Analista */}
