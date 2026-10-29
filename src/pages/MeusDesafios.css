@@ -185,3 +185,8 @@
 .btn-card-acao:hover {
   background-color: #f8fafc;
 }
+.desafio-aviso-api {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.8rem;
+}

@@ -1,47 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { listarDesafios } from '../services/desafioService';
+import type { Desafio } from '../types/desafio';
 import './DesafiosAbertos.css';
 
-interface Desafio {
-  id: string;
-  titulo: string;
-  descricao: string;
-  area: string;
-  autor: string;
-  dataCriacao: string;
-  status: 'aberto' | 'em_andamento' | 'concluido';
+interface DesafiosAbertosProps {
+  onProporIdeia: (desafioId: string) => void;
 }
 
-const desafiosIniciais: Desafio[] = [
-  {
-    id: '1',
-    titulo: 'Otimização do Fluxo de Atendimento ao Cliente no Balcão',
-    descricao: 'Buscamos ideias inovadoras para reduzir o tempo de espera dos clientes e agilizar a triagem inicial nas unidades físicas.',
-    area: 'Atendimento Operacional',
-    autor: 'Maria Souza (Gestor)',
-    dataCriacao: '10/10/2026',
-    status: 'aberto',
-  },
-  {
-    id: '2',
-    titulo: 'Automação na Gestão de Resíduos do Hub de Inovação',
-    descricao: 'Proposta para monitorizar e otimizar a recolha e reciclagem de resíduos gerados nos espaços comuns e laboratórios.',
-    area: 'Sustentabilidade',
-    autor: 'Carlos Eduardo (Gestor)',
-    dataCriacao: '12/10/2026',
-    status: 'aberto',
-  },
-];
-
-export function DesafiosAbertos()  {
-  const [desafios] = useState<Desafio[]>(desafiosIniciais);
+export function DesafiosAbertos({ onProporIdeia }: DesafiosAbertosProps) {
+  const [desafios, setDesafios] = useState<Desafio[]>([]);
   const [termoBusca, setTermoBusca] = useState('');
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
 
-  const desafiosFiltrados = desafios.filter(
-    (d) =>
-      d.titulo.toLowerCase().includes(termoBusca.toLowerCase()) ||
-      d.descricao.toLowerCase().includes(termoBusca.toLowerCase()) ||
-      d.area.toLowerCase().includes(termoBusca.toLowerCase())
-  );
+  useEffect(() => {
+    let ativo = true;
+    listarDesafios()
+      .then((resultado) => { if (ativo) setDesafios(resultado); })
+      .catch((error: unknown) => {
+        if (ativo) setErro(error instanceof Error ? error.message : 'Não foi possível carregar os desafios.');
+      })
+      .finally(() => { if (ativo) setCarregando(false); });
+    return () => { ativo = false; };
+  }, []);
+
+  const desafiosFiltrados = useMemo(() => desafios.filter((desafio) => {
+    const ativo = desafio.status.trim().toLowerCase() === 'ativo';
+    const termo = termoBusca.trim().toLowerCase();
+    return ativo && (!termo || [desafio.titulo, desafio.descricao, desafio.areaDemandante].some((valor) => valor.toLowerCase().includes(termo)));
+  }), [desafios, termoBusca]);
 
   return (
     <div className="desafios-container">
@@ -49,51 +36,32 @@ export function DesafiosAbertos()  {
         <h1>Desafios Abertos</h1>
         <p>Explore os gargalos operacionais e estratégicos da organização e submeta a sua proposta de solução.</p>
       </header>
-
-      <div className="desafios-banner-info">
-        <strong>Dica para o Colaborador:</strong> Escolha um desafio abaixo que esteja alinhado à sua área de atuação e clique em "Propor Ideia" para participar ativamente do ecossistema de inovação.
-      </div>
-
+      <div className="desafios-banner-info"><strong>Dica para o Colaborador:</strong> Escolha um desafio abaixo que esteja alinhado à sua área de atuação e clique em “Propor Ideia”.</div>
       <div>
-        <input
-          type="text"
-          className="desafios-search-input"
-          placeholder="Pesquisar desafios por título, descrição ou área..."
-          value={termoBusca}
-          onChange={(e) => setTermoBusca(e.target.value)}
-        />
+        <input type="text" className="desafios-search-input" placeholder="Pesquisar desafios por título, descrição ou área..." value={termoBusca} onChange={(e) => setTermoBusca(e.target.value)} />
       </div>
-
+      {carregando && <p role="status">Carregando desafios...</p>}
+      {erro && <p role="alert" style={{ color: '#b91c1c' }}>{erro}</p>}
       <div className="desafios-grid">
-        {desafiosFiltrados.length === 0 ? (
-          <p className="desafios-empty">Nenhum desafio encontrado com o termo pesquisado.</p>
-        ) : (
-          desafiosFiltrados.map((desafio) => (
-            <div key={desafio.id} className="desafio-card">
-              <div>
-                <div className="desafio-card-header">
-                  <span className="desafio-badge">{desafio.area}</span>
-                  <span className="desafio-data">Criado em: {desafio.dataCriacao}</span>
-                </div>
-
-                <div className="desafio-card-body" style={{ marginTop: '0.75rem' }}>
-                  <h3>{desafio.titulo}</h3>
-                  <p>{desafio.descricao}</p>
-                </div>
+        {!carregando && !erro && desafiosFiltrados.length === 0 ? (
+          <p className="desafios-empty">Nenhum desafio ativo encontrado.</p>
+        ) : desafiosFiltrados.map((desafio) => (
+          <div key={desafio.id} className="desafio-card">
+            <div>
+              <div className="desafio-card-header">
+                <span className="desafio-badge">{desafio.areaDemandante}</span>
+                <span className="desafio-data">{desafio.dataCriacao ? `Criado em: ${desafio.dataCriacao}` : `Desafio #${desafio.id}`}</span>
               </div>
-
-              <div className="desafio-card-footer">
-                <span className="desafio-autor">Responsável: {desafio.autor}</span>
-                <button
-                  className="desafio-btn-propor"
-                  onClick={() => alert(`Redirecionando para propor ideia para o desafio: ${desafio.titulo}`)}
-                >
-                  Propor Ideia
-                </button>
+              <div className="desafio-card-body" style={{ marginTop: '0.75rem' }}>
+                <h3>{desafio.titulo}</h3><p>{desafio.descricao}</p>
               </div>
             </div>
-          ))
-        )}
+            <div className="desafio-card-footer">
+              <span className="desafio-autor">Impacto {desafio.impacto} · Urgência {desafio.urgencia}</span>
+              <button className="desafio-btn-propor" onClick={() => onProporIdeia(desafio.id)}>Propor Ideia</button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

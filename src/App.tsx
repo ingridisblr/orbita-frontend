@@ -1,54 +1,30 @@
-
-import   { useState }             from 'react';
+import { useEffect, useState } from 'react';
 
 // Componentes comuns
-import      { Layout }            from './components/common/Layout';
-import type { NavigationItemId }  from './components/common/Sidebar';
+import { Layout } from './components/common/Layout';
+import type { NavigationItemId } from './components/common/Sidebar';
 
 // Autenticação
-import      { Login }              from './pages/Login';
-import      { SelecionarPerfil }   from './pages/SelecionarPerfil';
+import { Login } from './pages/Login';
+import { getMe, getToken, logout } from './services/authService';
 
 // Páginas do Colaborador
-import      { DesafiosAbertos }    from './pages/DesafiosAbertos';
-import      { ProporIdeia }        from './pages/ProporIdeia';
-import      { MinhasIdeias }       from './pages/MinhasIdeias';
+import { DesafiosAbertos } from './pages/DesafiosAbertos';
+import { ProporIdeia } from './pages/ProporIdeia';
+import { MinhasIdeias } from './pages/MinhasIdeias';
 
 // Páginas do Gestor
-import      { MeusDesafios }       from './pages/MeusDesafios';
-import      { NovoDesafio }        from './pages/NovoDesafio';
-import      { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
+import { MeusDesafios } from './pages/MeusDesafios';
+import { NovoDesafio } from './pages/NovoDesafio';
+import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
+
+// Página do Analista
+import CadastrarUsuario from './pages/CadastrarUsuario';
 
 // Tipos
-import type { User, UserRole }     from './types/auth';
-import type { Ideia }              from './types/ideia';
-
-// Usuários de demonstração
-const demoUsers: Record<UserRole, User> = {
-  colaborador: {
-    id: 'demo-colaborador',
-    name: 'Pedro Alves',
-    email: 'pedro.alves@example.com',
-    role: 'colaborador',
-    area: 'Administrativo',
-  },
-
-  gestor: {
-    id: 'demo-gestor',
-    name: 'Maria Souza',
-    email: 'maria.souza@example.com',
-    role: 'gestor',
-    area: 'Administrativa',
-  },
-
-  analista: {
-    id: 'demo-analista',
-    name: 'Ana Lima',
-    email: 'ana.lima@example.com',
-    role: 'analista',
-    area: 'Hub de Inovação',
-  },
-};
+import type { User, UserRole } from './types/auth';
+import type { Ideia } from './types/ideia';
+import { cadastrarIdeia } from './services/ideiaService';
 
 // Página inicial de cada perfil
 const initialPages: Record<UserRole, NavigationItemId> = {
@@ -76,6 +52,7 @@ const paginasPorPerfil: Record<UserRole, NavigationItemId[]> = {
   analista: [
     'ideias-relacionadas',
     'painel-avaliacao',
+    'cadastrar-usuario',
     'match',
     'triagem',
     'kanban',
@@ -95,6 +72,7 @@ const pageTitles: Record<NavigationItemId, string> = {
   'novo-desafio': 'Novo Desafio',
   'ideias-relacionadas': 'Ideias Relacionadas',
   'painel-avaliacao': 'Painel de Avaliação',
+  'cadastrar-usuario': 'Cadastrar Usuário',
   match: 'Match Ideia × Desafio',
   triagem: 'Triagem / Priorização',
   kanban: 'Projetos / Kanban',
@@ -105,39 +83,85 @@ const pageTitles: Record<NavigationItemId, string> = {
 };
 
 export default function App() {
-  // Estado da aplicação
-  const [enteredDemo, setEnteredDemo] = useState(false);
-
+  // Usuário autenticado (definido só depois de validar a sessão no backend)
   const [user, setUser] = useState<User | null>(null);
 
+  // Enquanto existir token, a sessão é validada antes de mostrar qualquer tela
+  const [validandoSessao, setValidandoSessao] = useState(
+    () => getToken() !== null
+  );
+
+  // Página ativa
   const [activeItem, setActiveItem] =
     useState<NavigationItemId>('desafios-abertos');
 
-  // Estado compartilhado das ideias
-  const [ideias, setIdeias] = useState<Ideia[]>([]);
+  const [desafioSelecionadoId, setDesafioSelecionadoId] = useState('');
 
-  // Selecionar perfil de demonstração
-  function handleSelectProfile(role: UserRole) {
-    const usuarioSelecionado = demoUsers[role];
+  // Valida a sessão com /auth/me ao abrir ou recarregar a aplicação
+  useEffect(() => {
+        if (!getToken()) {
+      return;
+    }
 
-    setUser(usuarioSelecionado);
-    setActiveItem(initialPages[role]);
+    let cancelado = false;
+
+    getMe()
+      .then((usuario) => {
+        if (cancelado) return;
+
+        setUser(usuario);
+        setActiveItem(initialPages[usuario.role]);
+      })
+      .catch(() => {
+        if (cancelado) return;
+
+        logout();
+        setUser(null);
+      })
+      .finally(() => {
+        if (!cancelado) setValidandoSessao(false);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Token inválido ou expirado: o api.ts dispara este evento ao receber 401
+  useEffect(() => {
+    function aoExpirarSessao() {
+      setUser(null);
+      setActiveItem('desafios-abertos');
+      setDesafioSelecionadoId('');
+    }
+
+    window.addEventListener('orbita:sessao-expirada', aoExpirarSessao);
+
+    return () => {
+      window.removeEventListener('orbita:sessao-expirada', aoExpirarSessao);
+    };
+  }, []);
+
+  // Login realizado com sucesso
+  function handleLoginSuccess(usuario: User) {
+    setUser(usuario);
+    setActiveItem(initialPages[usuario.role]);
   }
 
-  // Voltar à seleção de perfil
-  function handleSwitchProfile() {
-    setUser(null);
-    setActiveItem('desafios-abertos');
-  }
-
-  // Sair da demonstração
+  // Encerrar sessão
   function handleLogout() {
+    logout();
     setUser(null);
-    setEnteredDemo(false);
     setActiveItem('desafios-abertos');
+    setDesafioSelecionadoId('');
   }
 
-  // Navegação com verificação de perfil
+  // A opção de trocar perfil exige um novo login
+  function handleSwitchProfile() {
+    handleLogout();
+  }
+
+  // Navegação conforme o perfil
   function handleNavigate(item: NavigationItemId) {
     if (!user) return;
 
@@ -148,50 +172,48 @@ export default function App() {
     }
   }
 
-  // Cadastrar uma ideia enviada pelo formulário
-  function handleSubmitIdea(
-    novaIdeia: Omit<
-      Ideia,
-      'id' | 'status' | 'data' | 'usuarioId'
-    >
+  // Cadastrar a ideia no backend com o token do usuário autenticado
+  async function handleSubmitIdea(
+    novaIdeia: Omit<Ideia, 'id' | 'codigo' | 'status' | 'data' | 'usuarioId'>
   ) {
     if (!user || user.role !== 'colaborador') {
-      return;
+      throw new Error('Apenas colaboradores podem cadastrar ideias.');
     }
 
-    const ideiaCompleta: Ideia = {
-      ...novaIdeia,
-      id: crypto.randomUUID(),
-      status: 'Submetida',
-      data: new Date().toLocaleDateString('pt-BR'),
-      usuarioId: user.id,
-    };
+    const idDesafio = Number(novaIdeia.desafioId);
+   await cadastrarIdeia({
+  id_desafio: Number.isNaN(idDesafio) ? novaIdeia.desafioId : idDesafio,
+  titulo: novaIdeia.titulo,
+  descricao: novaIdeia.descricao,
+  area_origem: novaIdeia.areaOrigem,
+  categoria: novaIdeia.categoria,
+  beneficio_esperado: novaIdeia.beneficioEsperado,
+});
 
-    setIdeias((ideiasAnteriores) => [
-      ...ideiasAnteriores,
-      ideiaCompleta,
-    ]);
-
-    // Após o cadastro, abre a listagem
     setActiveItem('minhas-ideias');
   }
 
-  // Tela de entrada
-  if (!enteredDemo) {
+  // Tela de carregamento enquanto a sessão é validada
+  if (validandoSessao) {
     return (
-      <Login
-        onEnterDemo={() => setEnteredDemo(true)}
-      />
+      <main
+        role="status"
+        aria-live="polite"
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+        }}
+      >
+        <p>Carregando...</p>
+      </main>
     );
   }
 
-  // Seleção de perfil
+  // Exibe login quando não existe usuário autenticado
   if (!user) {
     return (
-      <SelecionarPerfil
-        onSelectProfile={handleSelectProfile}
-        onBack={handleLogout}
-      />
+      <Login onLoginSuccess={handleLoginSuccess} />
     );
   }
 
@@ -201,11 +223,6 @@ export default function App() {
   const paginaAtual = paginasPermitidas.includes(activeItem)
     ? activeItem
     : initialPages[user.role];
-
-  // Exibe somente as ideias do usuário atual
-  const minhasIdeias = ideias.filter(
-    (ideia) => ideia.usuarioId === user.id
-  );
 
   // Área principal da aplicação
   return (
@@ -218,32 +235,34 @@ export default function App() {
     >
       {/* Páginas do Colaborador */}
       {paginaAtual === 'desafios-abertos' && (
-        <DesafiosAbertos />
+        <DesafiosAbertos onProporIdeia={(id) => {
+          setDesafioSelecionadoId(id);
+          handleNavigate('propor-ideia');
+        }} />
       )}
 
       {paginaAtual === 'propor-ideia' && (
-        <ProporIdeia
-          onSubmit={handleSubmitIdea}
-        />
+        <ProporIdeia onSubmit={handleSubmitIdea} desafioIdInicial={desafioSelecionadoId} onVoltar={() => handleNavigate('desafios-abertos')} />
       )}
 
       {paginaAtual === 'minhas-ideias' && (
-        <MinhasIdeias
-          ideias={minhasIdeias}
-        />
+        <MinhasIdeias />
       )}
 
       {/* Páginas do Gestor */}
       {paginaAtual === 'meus-desafios' && (
         <MeusDesafios
-          onIrParaNovoDesafio={() =>
-            handleNavigate('novo-desafio')
-          }
+          onIrParaNovoDesafio={() => handleNavigate('novo-desafio')}
+          onIrParaIdeias={(id) => {
+            setDesafioSelecionadoId(id);
+            handleNavigate('ideias-relacionadas');
+          }}
         />
       )}
 
       {paginaAtual === 'novo-desafio' && (
         <NovoDesafio
+          email={user.email}
           onVoltar={() =>
             handleNavigate('meus-desafios')
           }
@@ -252,10 +271,16 @@ export default function App() {
 
       {/* Página compartilhada entre Gestor e Analista */}
       {paginaAtual === 'ideias-relacionadas' && (
-        <IdeiasRelacionadas />
+        <IdeiasRelacionadas desafioId={desafioSelecionadoId} onVoltarParaMeusDesafios={() => handleNavigate('meus-desafios')} />
       )}
 
-      {/* Fallback para módulos ainda não implementados */}
+      {/* Página do Analista */}
+      {paginaAtual === 'cadastrar-usuario' &&
+        user.role === 'analista' && (
+          <CadastrarUsuario />
+        )}
+
+      {/* Páginas ainda não implementadas */}
       {![
         'desafios-abertos',
         'propor-ideia',
@@ -263,10 +288,10 @@ export default function App() {
         'meus-desafios',
         'novo-desafio',
         'ideias-relacionadas',
+        'cadastrar-usuario',
       ].includes(paginaAtual) && (
         <main style={{ padding: '24px' }}>
           <h1>{pageTitles[paginaAtual]}</h1>
-
           <p>
             O conteúdo deste módulo será implementado
             nas próximas etapas do ÓRBITA.

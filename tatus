@@ -1,0 +1,17 @@
+[33mcommit 472294e710c2db7a47ffdef164d9c25e5cd88c41[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m)[m
+Merge: 63a9de6 4f684d6
+Author: ALINE SOUZA <ssouzaline88@gmail.com>
+Date:   Thu Oct 15 06:06:14 2026 -0300
+
+    Merge pull request #2 from ingridisblr/modulo-gestor
+    
+    feat(gestor): implementa MeusDesafios, NovoDesafio e IdeiasRelacionad…
+
+ src/App.tsx                      |  25 [32m++++[m[31m-[m
+ src/pages/IdeiasRelacionadas.css | 145 [32m+++++++++++++++++++++++++++[m
+ src/pages/IdeiasRelacionadas.tsx | 102 [32m+++++++++++++++++++[m
+ src/pages/MeusDesafios.css       | 187 [32m+++++++++++++++++++++++++++++++++++[m
+ src/pages/MeusDesafios.tsx       | 119 [32m++++++++++++++++++++++[m
+ src/pages/NovoDesafio.css        | 171 [32m++++++++++++++++++++++++++++++++[m
+ src/pages/NovoDesafio.tsx        | 206 [32m+++++++++++++++++++++++++++++++++++++++[m
+ 7 files changed, 951 insertions(+), 4 deletions(-)
