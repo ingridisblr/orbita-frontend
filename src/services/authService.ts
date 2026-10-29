@@ -1,4 +1,3 @@
-
 import { apiRequest } from './api';
 import type { User, UserRole } from '../types/auth';
 
@@ -75,8 +74,31 @@ export async function login(
   return usuario;
 }
 
+// Lê o campo exp do JWT. Não valida assinatura: quem valida é o backend.
+function tokenExpirado(token: string): boolean {
+  try {
+    const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const { exp } = JSON.parse(atob(payload)) as { exp?: number };
+
+    return typeof exp === 'number' && exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    return null;
+  }
+
+  if (tokenExpirado(token)) {
+    logout();
+    return null;
+  }
+
+  return token;
 }
 
 export function getCurrentUser(): User | null {
@@ -93,6 +115,20 @@ export function getCurrentUser(): User | null {
   } catch {
     return null;
   }
+}
+
+// Valida a sessão no backend e atualiza o usuário salvo com o perfil real.
+export async function getMe(): Promise<User> {
+  const resposta = await apiRequest<UsuarioApi | { usuario: UsuarioApi }>(
+    '/auth/me'
+  );
+
+  const dados = 'usuario' in resposta ? resposta.usuario : resposta;
+  const usuario = converterUsuario(dados);
+
+  localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+
+  return usuario;
 }
 
 export function logout(): void {

@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Componentes comuns
 import { Layout } from './components/common/Layout';
@@ -7,7 +6,7 @@ import type { NavigationItemId } from './components/common/Sidebar';
 
 // Autenticação
 import { Login } from './pages/Login';
-import { getCurrentUser, logout } from './services/authService';
+import { getMe, getToken, logout } from './services/authService';
 
 // Páginas do Colaborador
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
@@ -84,21 +83,64 @@ const pageTitles: Record<NavigationItemId, string> = {
 };
 
 export default function App() {
-  // Usuário autenticado
-  const [user, setUser] = useState<User | null>(() => getCurrentUser());
+  // Usuário autenticado (definido só depois de validar a sessão no backend)
+  const [user, setUser] = useState<User | null>(null);
 
-  // Página ativa
-  const [activeItem, setActiveItem] = useState<NavigationItemId>(
-    () => {
-      const usuarioAtual = getCurrentUser();
-
-      return usuarioAtual
-        ? initialPages[usuarioAtual.role]
-        : 'desafios-abertos';
-    }
+  // Enquanto existir token, a sessão é validada antes de mostrar qualquer tela
+  const [validandoSessao, setValidandoSessao] = useState(
+    () => getToken() !== null
   );
 
+  // Página ativa
+  const [activeItem, setActiveItem] =
+    useState<NavigationItemId>('desafios-abertos');
+
   const [desafioSelecionadoId, setDesafioSelecionadoId] = useState('');
+
+  // Valida a sessão com /auth/me ao abrir ou recarregar a aplicação
+  useEffect(() => {
+        if (!getToken()) {
+      return;
+    }
+
+    let cancelado = false;
+
+    getMe()
+      .then((usuario) => {
+        if (cancelado) return;
+
+        setUser(usuario);
+        setActiveItem(initialPages[usuario.role]);
+      })
+      .catch(() => {
+        if (cancelado) return;
+
+        logout();
+        setUser(null);
+      })
+      .finally(() => {
+        if (!cancelado) setValidandoSessao(false);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Token inválido ou expirado: o api.ts dispara este evento ao receber 401
+  useEffect(() => {
+    function aoExpirarSessao() {
+      setUser(null);
+      setActiveItem('desafios-abertos');
+      setDesafioSelecionadoId('');
+    }
+
+    window.addEventListener('orbita:sessao-expirada', aoExpirarSessao);
+
+    return () => {
+      window.removeEventListener('orbita:sessao-expirada', aoExpirarSessao);
+    };
+  }, []);
 
   // Login realizado com sucesso
   function handleLoginSuccess(usuario: User) {
@@ -139,13 +181,33 @@ export default function App() {
     }
 
     const idDesafio = Number(novaIdeia.desafioId);
-    await cadastrarIdeia({
-      id_desafio: Number.isNaN(idDesafio) ? novaIdeia.desafioId : idDesafio,
-      titulo: novaIdeia.titulo,
-      descricao: novaIdeia.descricao,
-    });
+   await cadastrarIdeia({
+  id_desafio: Number.isNaN(idDesafio) ? novaIdeia.desafioId : idDesafio,
+  titulo: novaIdeia.titulo,
+  descricao: novaIdeia.descricao,
+  area_origem: novaIdeia.areaOrigem,
+  categoria: novaIdeia.categoria,
+  beneficio_esperado: novaIdeia.beneficioEsperado,
+});
 
     setActiveItem('minhas-ideias');
+  }
+
+  // Tela de carregamento enquanto a sessão é validada
+  if (validandoSessao) {
+    return (
+      <main
+        role="status"
+        aria-live="polite"
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+        }}
+      >
+        <p>Carregando...</p>
+      </main>
+    );
   }
 
   // Exibe login quando não existe usuário autenticado

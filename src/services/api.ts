@@ -32,6 +32,15 @@ export async function apiRequest<T>(
 
   const resultado = await resposta.json().catch(() => null);
 
+  // Token inválido ou expirado: limpa a sessão e avisa o App.
+  // No login, 401 significa senha errada, por isso fica de fora.
+  if (resposta.status === 401 && endpoint !== '/auth/login') {
+    localStorage.removeItem('orbita.token');
+    localStorage.removeItem('orbita.user');
+    window.dispatchEvent(new Event('orbita:sessao-expirada'));
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
+
   if (!resposta.ok) {
     throw new Error(
       resultado?.mensagem ??

@@ -28,6 +28,9 @@ export interface CriarIdeiaPayload {
   id_desafio: number | string;
   titulo: string;
   descricao: string;
+  area_origem?: string;
+  categoria?: string;
+  beneficio_esperado?: string;
 }
 
 export interface IdeiaApi {
