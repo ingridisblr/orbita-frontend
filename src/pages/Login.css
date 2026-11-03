@@ -1,0 +1,117 @@
+/* #region Layout */
+.login {
+  display:               grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  min-height: 100vh;
+
+  background-color: var(--login-panel-bg);
+}
+
+.login__brand,
+.login__panel {
+  display:     grid;
+  place-items: center;
+
+  min-width: 0;
+  padding:   var(--login-section-padding);
+}
+/* #endregion */
+
+/* #region Apresentação */
+.login__brand {
+  background-color: var(--login-brand-bg);
+  color:            var(--login-brand-text);
+}
+
+.login__brand-content {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            var(--login-brand-gap);
+
+  width:     100%;
+  max-width: var(--login-brand-max-width);
+}
+
+.login__logo {
+  display: block;
+
+  width:     var(--login-logo-width);
+  max-width: 100%;
+  height:    auto;
+
+  object-fit: contain;
+}
+
+.login__description {
+  color:       var(--login-secondary-text);
+  font-size:   var(--login-description-size);
+  line-height: var(--login-description-height);
+  text-align:  center;
+}
+/* #endregion */
+
+/* #region Formulário */
+.login__panel {
+  background-color: var(--login-panel-bg);
+}
+
+.login__form-container {
+  width:     100%;
+  max-width: var(--login-content-max-width);
+}
+
+.login__header {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--login-header-gap);
+}
+
+.login__header h1 {
+  color:     var(--login-heading-text);
+  font-size: var(--login-heading-size);
+}
+
+.login__header p {
+  color:     var(--login-description-text);
+  font-size: var(--login-description-size);
+}
+
+.login__form {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--login-form-gap);
+
+  margin-top: var(--login-form-margin-top);
+}
+
+.login__submit {
+  width: 100%;
+}
+
+.login__demo-notice,
+.login__help {
+  color:      var(--login-description-text);
+  font-size:  var(--login-help-font-size);
+  text-align: center;
+}
+
+.login__help {
+  margin-top: var(--login-help-margin-top);
+}
+/* #endregion */
+
+/* #region Responsividade */
+@media (max-width: 48rem) {
+  .login {
+    grid-template-columns: minmax(0, 1fr);
+    align-content:         center;
+  }
+
+  .login__brand,
+  .login__panel {
+    padding: var(--login-mobile-padding);
+  }
+}
+/* #endregion */

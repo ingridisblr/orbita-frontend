@@ -1,0 +1,76 @@
+/* #region Organização do campo */
+.textarea-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--textarea-field-gap);
+
+  min-width: 0;
+}
+/* #endregion */
+
+/* #region Label */
+.textarea-field__label {
+  color:          var(--textarea-label-color);
+  font-family:    var(--textarea-font-family);
+  font-size:      var(--textarea-label-font-size);
+  font-weight:    var(--textarea-label-font-weight);
+  line-height:    var(--textarea-line-height);
+  letter-spacing: var(--textarea-label-spacing);
+  text-transform: uppercase;
+}
+/* #endregion */
+
+/* #region Campo */
+.textarea {
+  width:     100%;
+  min-width: 0;
+  padding:   var(--textarea-padding-y) var(--textarea-padding-x);
+
+  background-color: var(--textarea-bg);
+  color:            var(--textarea-text);
+
+  border:        var(--textarea-border-width) solid var(--textarea-border-color);
+  border-radius: var(--textarea-border-radius);
+
+  font-family: var(--textarea-font-family);
+  font-size:   var(--textarea-font-size);
+  line-height: var(--textarea-line-height);
+
+  resize: vertical;
+}
+
+.textarea::placeholder {
+  color:   var(--textarea-placeholder);
+  opacity: 1;
+}
+/* #endregion */
+
+/* #region Mensagens */
+.textarea-field__message {
+  color:       var(--textarea-message-color);
+  font-family: var(--textarea-font-family);
+  font-size:   var(--textarea-message-font-size);
+  line-height: var(--textarea-line-height);
+
+  overflow-wrap: anywhere;
+}
+/* #endregion */
+
+/* #region Estado de erro */
+.textarea--error {
+  border-color: var(--textarea-error-color);
+}
+
+.textarea-field__message--error {
+  color: var(--textarea-error-color);
+}
+/* #endregion */
+
+/* #region Estado desabilitado */
+.textarea:disabled {
+  background-color: var(--textarea-disabled-bg);
+  color:            var(--textarea-disabled-text);
+
+  cursor: not-allowed;
+}
+/* #endregion */

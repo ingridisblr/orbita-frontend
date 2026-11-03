@@ -1,0 +1,54 @@
+/* #region Estrutura */
+.app-layout {
+  min-height: 100vh;
+
+  background-color: var(--layout-bg);
+}
+
+.app-layout__main {
+  min-width:   0;
+  min-height:  100vh;
+  margin-left: var(--sidebar-width);
+  padding:     var(--layout-padding-y) var(--layout-padding-x);
+}
+
+.app-layout__content {
+  width:     100%;
+  max-width: var(--layout-content-max-width);
+  margin:    0 auto;
+}
+/* #endregion */
+
+/* #region Link de acessibilidade */
+.app-layout__skip-link {
+  position: fixed;
+  top:      var(--layout-skip-offset);
+  left:     var(--layout-skip-offset);
+  z-index:  var(--layout-skip-z-index);
+
+  padding: var(--layout-skip-padding-y)
+           var(--layout-skip-padding-x);
+
+  background-color: var(--layout-skip-bg);
+  color:            var(--layout-skip-text);
+  border-radius:    var(--layout-skip-radius);
+
+  font-size: var(--layout-skip-font-size);
+
+  transform: translateY(calc(-100% - var(--layout-skip-offset)));
+}
+
+.app-layout__skip-link:focus {
+  transform: translateY(0);
+}
+/* #endregion */
+
+/* #region Responsividade */
+@media (max-width: 48rem) {
+  .app-layout__main {
+    min-height:  0;
+    margin-left: 0;
+    padding:     var(--layout-mobile-padding);
+  }
+}
+/* #endregion */
