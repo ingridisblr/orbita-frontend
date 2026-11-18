@@ -35,7 +35,9 @@ export function ProporIdeia({ onSubmit, desafioIdInicial, onVoltar }: ProporIdei
     listarDesafios()
       .then((resultado) => {
         if (!ativo) return;
-        const ativos = resultado.filter((desafio) => desafio.status.trim().toLowerCase() === 'ativo');
+        const ativos = resultado.filter((desafio) =>
+        ['ativo', 'aberto'].includes(desafio.status.trim().toLowerCase())
+      );
         setDesafios(ativos);
         setFormData((atual) => ({ ...atual, desafioId: desafioIdInicial && ativos.some((item) => item.id === desafioIdInicial) ? desafioIdInicial : atual.desafioId }));
       })
@@ -55,7 +57,7 @@ export function ProporIdeia({ onSubmit, desafioIdInicial, onVoltar }: ProporIdei
     e.preventDefault();
     const desafioSelecionado = desafios.find((desafio) => desafio.id === formData.desafioId);
     if (!desafioSelecionado || !formData.titulo.trim() || !formData.resumo.trim()) {
-      setErroDesafios('Selecione um desafio ativo e preencha o título e a descrição da ideia.');
+      setErroDesafios('Selecione um desafio aberto e preencha o título e a descrição da ideia.');
       return;
     }
 
