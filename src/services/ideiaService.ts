@@ -129,3 +129,30 @@ export async function aprovarIdeia(id: string): Promise<Ideia> {
 
   return converterIdeia(resposta);
 }
+
+// Todas as ideias visíveis ao usuário (o Analista/Hub vê todas),
+// percorrendo as páginas de até 100 itens
+export async function listarTodasIdeias(): Promise<Ideia[]> {
+  const todas: Ideia[] = [];
+  let pagina = 1;
+  let totalPaginas = 1;
+
+  do {
+    const parametros = new URLSearchParams({
+      page:      String(pagina),
+      page_size: '100',
+    });
+
+    const resposta = await apiRequest<unknown>(
+      `/ideias?${parametros.toString()}`
+    );
+
+    todas.push(...extrairLista(resposta).map(converterIdeia));
+
+    const paginas = (resposta as { pages?: unknown } | null)?.pages;
+    totalPaginas = typeof paginas === 'number' ? paginas : 1;
+    pagina += 1;
+  } while (pagina <= totalPaginas && pagina <= 50);
+
+  return todas;
+}

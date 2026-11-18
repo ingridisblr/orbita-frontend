@@ -21,6 +21,7 @@ import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
 
 // Página do Analista
 import CadastrarUsuario from './pages/CadastrarUsuario';
+import { Match } from './pages/Match';
 
 // Tipos
 import type { User, UserRole } from './types/auth';
@@ -218,6 +219,11 @@ export default function App() {
           <CadastrarUsuario />
         )}
 
+      {paginaAtual === 'match' &&
+        user.role === 'analista' && (
+          <Match user={user} />
+        )}
+
       {/* Páginas ainda não implementadas */}
       {![
         'desafios-abertos',
@@ -227,6 +233,7 @@ export default function App() {
         'novo-desafio',
         'ideias-relacionadas',
         'cadastrar-usuario',
+        'match',
       ].includes(paginaAtual) && (
         <main style={{ padding: '24px' }}>
           <h1>{pageTitles[paginaAtual]}</h1>
