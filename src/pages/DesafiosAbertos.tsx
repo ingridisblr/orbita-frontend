@@ -25,7 +25,9 @@ export function DesafiosAbertos({ onProporIdeia }: DesafiosAbertosProps) {
   }, []);
 
   const desafiosFiltrados = useMemo(() => desafios.filter((desafio) => {
-    const ativo = desafio.status.trim().toLowerCase() === 'ativo';
+    const ativo = ['ativo', 'aberto'].includes(
+    desafio.status.trim().toLowerCase()
+  );
     const termo = termoBusca.trim().toLowerCase();
     return ativo && (!termo || [desafio.titulo, desafio.descricao, desafio.areaDemandante].some((valor) => valor.toLowerCase().includes(termo)));
   }), [desafios, termoBusca]);
