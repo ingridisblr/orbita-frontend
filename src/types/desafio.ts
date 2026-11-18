@@ -1,3 +1,10 @@
+export interface RespostaPaginada<T> {
+  items: T[];
+  total?: number;
+  page?: number;
+  pages?: number;
+}
+
 export interface DesafioApi {
   id_desafio: number | string;
   titulo: string;

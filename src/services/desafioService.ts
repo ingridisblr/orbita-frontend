@@ -4,26 +4,28 @@ import {
   type Desafio,
   type DesafioApi,
   type NovoDesafioPayload,
+  type RespostaPaginada,
 } from '../types/desafio';
 
 export async function listarDesafios(): Promise<Desafio[]> {
-  const resposta = await apiRequest<DesafioApi[]>(
-    '/desafio/listar_todos'
+  const resposta = await apiRequest<RespostaPaginada<DesafioApi> | DesafioApi[]>(
+    '/desafios'
   );
-
-  if (!Array.isArray(resposta)) {
+  const lista = Array.isArray(resposta)
+    ? resposta
+    : resposta?.items;
+  if (!Array.isArray(lista)) {
     throw new Error(
       'A API retornou uma lista de desafios em formato inválido.'
     );
   }
-
-  return resposta.map(converterDesafio);
+  return lista.map(converterDesafio);
 }
 
 export async function cadastrarDesafio(
   dados: NovoDesafioPayload
 ): Promise<void> {
-  await apiRequest<unknown>('/desafio/add', {
+  await apiRequest<unknown>('/desafios', {
     method: 'POST',
     body: JSON.stringify(dados),
   });
@@ -35,7 +37,7 @@ export async function excluirDesafio(id: string): Promise<void> {
   }
 
   await apiRequest<unknown>(
-    `/desafio/delete/${encodeURIComponent(id)}`,
+    `/desafios/${encodeURIComponent(id)}`,
     { method: 'DELETE' }
   );
 }

@@ -1,6 +1,6 @@
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  'https://orbita-plataformaparagestaodedemandas.onrender.com/api/v1';
+  'https://orbita-plataformaparagestaodedemandas-h7q2.onrender.com/api/v1';
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -35,10 +35,10 @@ export async function apiRequest<T>(
   if (!resposta.ok) {
     throw new Error(
       resultado?.mensagem ??
-        resultado?.message ??
-        resultado?.erro ??
-        resultado?.error ??
-        'Ocorreu um erro ao comunicar com a API.'
+      resultado?.message ??
+      resultado?.erro ??
+      resultado?.error ??
+      'Ocorreu um erro ao comunicar com a API.'
     );
   }
 

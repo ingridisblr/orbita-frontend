@@ -40,7 +40,7 @@ export const NovoDesafio: React.FC<NovoDesafioProps> = ({ email, onVoltar }) => 
         impacto: formData.impacto,
         urgencia: formData.urgencia,
         categoria: formData.categoria,
-        status: 'ativo',
+        status: 'aberto',
       });
       setSucesso(true);
       window.setTimeout(onVoltar, 1200);
