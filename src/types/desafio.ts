@@ -42,7 +42,7 @@ export interface NovoDesafioPayload {
   impacto: string;
   urgencia: string;
   categoria: string;
-  status: 'ativo';
+  status: 'aberto' | 'ativo';
 }
 
 export function converterDesafio(dado: DesafioApi): Desafio {
