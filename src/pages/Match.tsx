@@ -24,6 +24,7 @@ import {
   rotuloStatusMatch,
 } from '../utils/matchFormatters';
 import './Match.css';
+import { SugestoesIa } from '../components/match/SugestoesIa';
 
 interface MatchProps {
   user: User;
@@ -190,6 +191,12 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
   function mudarAba(nova: Aba) {
     setAba(nova);
     setBusca('');
+  }
+
+  function recarregarMatches() {
+    listarTodosMatches()
+      .then(setMatches)
+      .catch(() => undefined);
   }
 
   async function handleVincular(evento: React.SyntheticEvent) {
@@ -371,6 +378,8 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
               </div>
             )}
           </section>
+
+          <SugestoesIa desafios={desafios} onAtualizado={recarregarMatches} />
 
           {/* Listagem de ideias e desafios */}
           <section className="match-card" aria-labelledby="match-catalogo-titulo">

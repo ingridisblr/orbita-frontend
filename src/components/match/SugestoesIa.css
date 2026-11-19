@@ -1,0 +1,28 @@
+.sugestoes-ia__texto {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.sugestoes-ia__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.sugestoes-ia__form > :first-child {
+  flex: 1 1 320px;
+}
+
+.sugestoes-ia__meta {
+  margin: 0.5rem 0 0.75rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.sugestoes-ia__lista {
+  display: grid;
+  gap: 1rem;
+}
