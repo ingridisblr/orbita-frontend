@@ -1,0 +1,352 @@
+.kanban-page {
+  --kanban-azul: var(--color-brand-blue, #102e5c);
+  --kanban-texto: var(--color-text, #172b4d);
+  --kanban-secundario: var(--color-text-secondary, #52647c);
+  --kanban-borda: var(--color-border, #e2e8f0);
+  --kanban-superficie: var(--color-surface, #fff);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--kanban-texto);
+}
+
+.kanban-page *,
+.kanban-page *::before,
+.kanban-page *::after {
+  box-sizing: border-box;
+}
+
+.kanban-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.kanban-page__header h1 {
+  margin: 0 0 0.4rem;
+  color: var(--kanban-azul);
+  font-size: clamp(1.6rem, 2.35vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.kanban-page__header p {
+  margin: 0;
+  color: var(--kanban-secundario);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.kanban-page__btn,
+.kanban-page__adicionar {
+  min-height: 2.65rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 8px;
+  background: var(--kanban-superficie);
+  color: var(--kanban-azul);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kanban-page__btn--primario {
+  background: var(--color-primary, #f9d928);
+  color: var(--color-primary-text, #102e5c);
+  border-color: transparent;
+}
+
+.kanban-page button:disabled,
+.kanban-page select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.kanban-page button:enabled:hover {
+  filter: brightness(0.97);
+}
+
+.kanban-page :is(button, input, select):focus-visible {
+  outline: 2px solid var(--color-focus, #2457a7);
+  outline-offset: 3px;
+}
+
+.kanban-page__board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(12rem, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+  padding: 2px 2px 0.75rem;
+  overflow-x: auto;
+}
+
+.kanban-page__coluna {
+  --kanban-etapa: #6483b4;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--kanban-borda);
+  border-top: 3px solid var(--kanban-etapa);
+  border-radius: 12px;
+  background: #f4f7fb;
+}
+
+.kanban-page__coluna--planejamento { --kanban-etapa: #c78a08; }
+.kanban-page__coluna--desenvolvimento { --kanban-etapa: #2457a7; }
+.kanban-page__coluna--teste { --kanban-etapa: #6356a8; }
+.kanban-page__coluna--concluido { --kanban-etapa: #167a77; }
+
+.kanban-page__coluna-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+}
+
+.kanban-page__coluna-header h2 {
+  margin: 0;
+  color: var(--kanban-azul);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.kanban-page__contagem {
+  display: grid;
+  place-items: center;
+  min-width: 1.4rem;
+  min-height: 1.4rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: #e8edf5;
+  color: #334e73;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.kanban-page__lista {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 0.65rem;
+  padding: 0;
+  list-style: none;
+}
+
+.kanban-page__projeto {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 9px;
+  background: var(--kanban-superficie);
+  box-shadow: 0 2px 8px rgb(16 46 92 / 5%);
+  overflow-wrap: anywhere;
+}
+
+.kanban-page__codigo {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--kanban-secundario);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.kanban-page__projeto h3 {
+  margin: 0;
+  color: var(--kanban-texto);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.kanban-page__projeto p {
+  margin: 0.45rem 0 0;
+  color: var(--kanban-secundario);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.kanban-page__vazio {
+  padding: 0.8rem 0.4rem;
+  color: var(--kanban-secundario);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.kanban-page__adicionar {
+  width: 100%;
+  min-height: 2.3rem;
+  border: 1px dashed #bfcddd;
+  background: transparent;
+  color: var(--kanban-secundario);
+  font-size: 0.78rem;
+}
+
+.kanban-page__form-card {
+  padding: 1.5rem;
+}
+
+.kanban-page__form-card h2 {
+  margin: 0 0 0.35rem;
+  color: var(--kanban-azul);
+  font-size: 1.35rem;
+  letter-spacing: -0.025em;
+}
+
+.kanban-page__form-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.kanban-page__form-fields label,
+.kanban-page__mover {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--kanban-secundario);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.kanban-page :is(input, select) {
+  min-width: 0;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 7px;
+  color: var(--kanban-texto);
+  background: var(--kanban-superficie);
+  font: inherit;
+}
+
+.kanban-page__mover {
+  margin-top: 0.75rem;
+  font-size: 0.72rem;
+}
+
+.kanban-page__form-actions {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--kanban-borda);
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.kanban-page__estado {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 8px;
+  background: var(--kanban-superficie);
+  color: var(--kanban-secundario);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.kanban-page__erro {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.kanban-page__sucesso {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+@media (max-width: 760px) {
+  .kanban-page__form-fields { grid-template-columns: minmax(0, 1fr); }
+  .kanban-page__board { grid-template-columns: repeat(5, minmax(15rem, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .kanban-page__header > button { width: 100%; }
+  .kanban-page__form-card { padding: 1rem; }
+}
+
+.kanban-page__modal {
+  width: min(35rem, calc(100% - 2rem));
+  max-height: calc(100% - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 16px;
+  background: var(--kanban-superficie);
+  color: var(--kanban-texto);
+  box-shadow: 0 24px 70px rgb(16 46 92 / 24%);
+}
+
+.kanban-page__modal::backdrop {
+  background: rgb(15 23 42 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.kanban-page__modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.kanban-page__modal-header p {
+  margin: 0;
+  color: var(--kanban-secundario);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.kanban-page__modal-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--kanban-borda);
+  border-radius: 8px;
+  background: var(--kanban-superficie);
+  color: var(--kanban-secundario);
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.kanban-page__campo-titulo {
+  grid-column: 1 / -1;
+}
+
+.kanban-page__modal :is(input, select) {
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.kanban-page__projeto:hover {
+  border-color: #b9cbe4;
+}
+
+.kanban-page__adicionar:enabled:hover {
+  border-color: #8ba8d0;
+  background: #eef4ff;
+  color: var(--kanban-azul);
+}
+
+@media (max-width: 480px) {
+  .kanban-page__form-actions > button {
+    flex: 1 1 auto;
+  }
+}

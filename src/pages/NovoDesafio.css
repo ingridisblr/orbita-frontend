@@ -1,171 +1,403 @@
-.novo-desafio-container {
-  padding: 2rem;
-  max-width: 1300px;
+.novo-desafio-page {
+  --nd-azul: var(--color-brand-blue, #102e5c);
+  --nd-texto: var(--color-text, #172b4d);
+  --nd-secundario: var(--color-text-secondary, #52647c);
+  --nd-borda: var(--color-border, #e2e8f0);
+  --nd-superficie: var(--color-surface, #fff);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--nd-texto);
 }
 
-.link-voltar-gestor {
-  background: none;
-  border: none;
-  color: #2563eb;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 0.75rem;
-  display: flex;
+.novo-desafio-page *,
+.novo-desafio-page *::before,
+.novo-desafio-page *::after {
+  box-sizing: border-box;
+}
+
+.novo-desafio-page__voltar {
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.4rem;
+  min-height: 2rem;
+  margin: 0 0 0.8rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2457a7;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.link-voltar-gestor:hover {
+.novo-desafio-page__voltar:enabled:hover {
   text-decoration: underline;
 }
 
-.novo-desafio-header {
-  margin-bottom: 2rem;
+.novo-desafio-page__header {
+  margin-bottom: 1.75rem;
 }
 
-.novo-desafio-header h1 {
-  font-size: 1.8rem;
-  color: #0f172a;
-  margin-bottom: 0.25rem;
-}
-
-.novo-desafio-header p {
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
-.novo-desafio-layout {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-.novo-desafio-form {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-row-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #334155;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.form-control {
-  padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s;
-  background-color: #fff;
-  color: #0f172a;
-}
-
-.form-control:focus {
-  border-color: #2563eb;
-}
-
-/* Painel lateral "Como Funciona" */
-.como-funciona-box {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.como-funciona-box h3 {
-  font-size: 0.85rem;
+.novo-desafio-page__header h1 {
+  margin: 0 0 0.4rem;
+  color: var(--nd-azul);
+  font-size: clamp(1.6rem, 2.35vw, 2rem);
   font-weight: 700;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
 }
 
-.como-funciona-box ul {
-  list-style: none;
-  padding: 0;
+.novo-desafio-page__header p {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  color: var(--nd-secundario);
+  font-size: 0.95rem;
+  line-height: 1.55;
 }
 
-.como-funciona-box li {
+.novo-desafio-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(17rem, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+}
+
+.novo-desafio-page__form,
+.novo-desafio-page__resumo {
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid var(--nd-borda);
+  border-radius: 14px;
+  background: var(--nd-superficie);
+  box-shadow: 0 3px 12px rgb(16 46 92 / 4%);
+}
+
+.novo-desafio-page__form {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.novo-desafio-page__linha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.novo-desafio-page__linha--tres {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr);
+}
+
+.novo-desafio-page__campo {
+  display: grid;
+  min-width: 0;
+  gap: 0.4rem;
+  align-content: start;
+}
+
+.novo-desafio-page__campo label {
+  color: var(--nd-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.novo-desafio-page__campo :is(input, textarea, select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.85rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: var(--nd-superficie);
+  color: var(--nd-texto);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  transition: border-color 0.15s ease;
+}
+
+.novo-desafio-page__campo textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.novo-desafio-page__campo :is(input, textarea)::placeholder {
+  color: #6b7d97;
+  opacity: 1;
+}
+
+.novo-desafio-page__campo :is(input, select, textarea):focus {
+  border-color: #2457a7;
+}
+
+.novo-desafio-page :is(input, textarea, select, button):focus-visible {
+  outline: 2px solid var(--color-focus, #2457a7);
+  outline-offset: 2px;
+}
+
+.novo-desafio-page__acoes {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding-top: 1rem;
+  margin-top: 0.2rem;
+  border-top: 1px solid var(--nd-borda);
+}
+
+.novo-desafio-page__btn {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: var(--nd-superficie);
+  color: var(--nd-azul);
+  font: inherit;
   font-size: 0.875rem;
-  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.novo-desafio-page__btn:enabled:hover {
+  background: #f1f5f9;
+}
+
+.novo-desafio-page__btn--primario {
+  background: var(--color-primary, #f9d928);
+  color: var(--color-primary-text, #102e5c);
+  border-color: transparent;
+}
+
+.novo-desafio-page__btn--primario:enabled:hover {
+  background: var(--color-primary-hover, #eccb19);
+}
+
+.novo-desafio-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.novo-desafio-page__resumo {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+}
+
+.novo-desafio-page__resumo-header h2 {
+  margin: 0 0 0.35rem;
+  color: var(--nd-azul);
+  font-size: 1.15rem;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.novo-desafio-page__resumo-header p {
+  margin: 0;
+  color: var(--nd-secundario);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.novo-desafio-page__progresso {
+  margin: 1.15rem 0 1.3rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--nd-borda);
+}
+
+.novo-desafio-page__progresso-texto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.45rem;
+  margin-bottom: 0.5rem;
+  color: var(--nd-secundario);
+  font-size: 0.8rem;
+}
+
+.novo-desafio-page__progresso-texto strong {
+  color: var(--nd-azul);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.novo-desafio-page__barra {
+  display: block;
+  width: 100%;
+  height: 0.6rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #edf2f7;
+  accent-color: #167a4a;
+  appearance: none;
+}
+
+.novo-desafio-page__barra::-webkit-progress-bar {
+  background: #edf2f7;
+  border-radius: 999px;
+}
+
+.novo-desafio-page__barra::-webkit-progress-value {
+  background: #167a4a;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.novo-desafio-page__barra::-moz-progress-bar {
+  background: #167a4a;
+  border-radius: 999px;
+}
+
+.novo-desafio-page__etapas {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.novo-desafio-page__etapa {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.65rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+}
+
+.novo-desafio-page__etapa:last-child {
+  padding-bottom: 0;
+}
+
+.novo-desafio-page__etapa:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 1.65rem;
+  bottom: 0;
+  left: calc(0.825rem - 1px);
+  width: 2px;
+  background: var(--nd-borda);
+}
+
+.novo-desafio-page__etapa--completa:not(:last-child)::after {
+  background: #b5dec7;
+}
+
+.novo-desafio-page__ponto {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.novo-desafio-page__etapa--completa .novo-desafio-page__ponto {
+  background: #e7f5ed;
+  border-color: #b5dec7;
+  color: #166534;
+}
+
+.novo-desafio-page__etapa-conteudo {
+  min-width: 0;
+  padding-top: 0.15rem;
+  overflow-wrap: anywhere;
+}
+
+.novo-desafio-page__etapa-conteudo h3 {
+  margin: 0 0 0.25rem;
+  color: var(--nd-texto);
+  font-size: 0.85rem;
+  font-weight: 650;
   line-height: 1.4;
 }
 
-.como-funciona-box li strong {
-  color: #0f172a;
+.novo-desafio-page__valor,
+.novo-desafio-page__pendente {
+  margin: 0;
+  color: var(--nd-secundario);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
-.form-actions {
+.novo-desafio-page__valor {
+  color: var(--nd-texto);
+}
+
+.novo-desafio-page__pendente {
+  font-size: 0.77rem;
+}
+
+.novo-desafio-page__resumo-completo {
   display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
-.btn-cancelar {
-  background-color: #ffffff;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.novo-desafio-page__estado {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--nd-borda);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
 }
 
-.btn-cancelar:hover {
-  background-color: #f8fafc;
+.novo-desafio-page__estado--sucesso {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
 }
 
-.btn-publicar {
-  background-color: #0f172a;
-  color: #ffffff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.novo-desafio-page__estado--erro {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
 }
 
-.btn-publicar:hover {
-  background-color: #1e293b;
+@media (max-width: 1050px) {
+  .novo-desafio-page__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .novo-desafio-page__resumo {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 600px) {
+  .novo-desafio-page__linha,
+  .novo-desafio-page__linha--tres {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .novo-desafio-page__acoes > button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .novo-desafio-page__campo :is(input, textarea, select),
+  .novo-desafio-page__barra::-webkit-progress-value {
+    transition: none;
+  }
 }

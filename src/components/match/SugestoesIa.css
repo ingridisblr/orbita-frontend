@@ -4,18 +4,56 @@
   font-size: var(--font-size-sm);
 }
 
+/* #region Formulário de sugestões */
+
 .sugestoes-ia__form {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
+
   margin-bottom: 1rem;
 }
 
 .sugestoes-ia__form > :first-child {
   flex: 1 1 320px;
+  min-width: 0;
 }
 
+/* Botão alinhado à altura do campo Select */
+.sugestoes-ia__form > .button {
+  align-self: flex-start;
+
+  min-height: var(--select-min-height);
+  margin-top: 1.5rem;
+
+  white-space: nowrap;
+}
+
+/* #endregion */
+
+
+/* #region Responsividade */
+
+@media (max-width: 640px) {
+  .sugestoes-ia__form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .sugestoes-ia__form > :first-child {
+    flex: 0 1 auto;
+    width: 100%;
+  }
+
+  .sugestoes-ia__form > .button {
+    width: 100%;
+    margin-top: 0;
+  }
+}
+
+/* #endregion */
 .sugestoes-ia__meta {
   margin: 0.5rem 0 0.75rem;
   font-size: var(--font-size-sm);

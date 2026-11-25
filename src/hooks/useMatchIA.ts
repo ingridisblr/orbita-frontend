@@ -1,19 +1,34 @@
+/* #region Importações */
 import { useCallback, useRef, useState } from 'react';
-import { revisarMatch, sugerirMatchesIa } from '../services/matchIaService';
-import type { DecisaoMatch, ResultadoMatchIa } from '../types/matchIa';
 
+import { revisarMatch, sugerirMatchesIa } from '../services/matchIaService';
+
+import type { DecisaoMatch, ResultadoMatchIa } from '../types/matchIa';
+/* #endregion */
+
+/* #region Hook */
 export function useMatchIA() {
+
+  /* #region Estados */
   const [resultado, setResultado] = useState<ResultadoMatchIa | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
+
   const [revisando, setRevisando] = useState<string | null>(null);
   const [errosRevisao, setErrosRevisao] = useState<Record<string, string>>({});
+  /* #endregion */
 
-  // Ignora resposta atrasada de uma consulta já substituída ou limpa.
+  /* #region Controle de requisições */
+
+  // Ignora respostas atrasadas de consultas substituídas ou canceladas.
   const requisicaoAtual = useRef(0);
 
+  /* #endregion */
+
+  /* #region Gerar sugestões da IA */
   const sugerir = useCallback(async (desafioId: string, topN?: number) => {
     const requisicao = ++requisicaoAtual.current;
+
     setCarregando(true);
     setErro('');
     setResultado(null);
@@ -21,7 +36,10 @@ export function useMatchIA() {
 
     try {
       const dados = await sugerirMatchesIa(desafioId, topN);
-      if (requisicao === requisicaoAtual.current) setResultado(dados);
+
+      if (requisicao === requisicaoAtual.current) {
+        setResultado(dados);
+      }
     } catch (error: unknown) {
       if (requisicao === requisicaoAtual.current) {
         setErro(
@@ -31,17 +49,34 @@ export function useMatchIA() {
         );
       }
     } finally {
-      if (requisicao === requisicaoAtual.current) setCarregando(false);
+      if (requisicao === requisicaoAtual.current) {
+        setCarregando(false);
+      }
     }
   }, []);
+  /* #endregion */
 
+  /* #region Revisar sugestão */
   const revisar = useCallback(
-    async (matchId: string, decisao: DecisaoMatch, justificativa?: string) => {
+    async (
+      matchId: string,
+      decisao: DecisaoMatch,
+      justificativa?: string
+    ) => {
       setRevisando(matchId);
-      setErrosRevisao((atual) => ({ ...atual, [matchId]: '' }));
+
+      setErrosRevisao((atual) => ({
+        ...atual,
+        [matchId]: '',
+      }));
 
       try {
-        const novoStatus = await revisarMatch(matchId, decisao, justificativa);
+        const novoStatus = await revisarMatch(
+          matchId,
+          decisao,
+          justificativa
+        );
+
         setResultado((atual) =>
           atual
             ? {
@@ -68,16 +103,21 @@ export function useMatchIA() {
     },
     []
   );
+  /* #endregion */
 
+  /* #region Limpar resultados */
   const limpar = useCallback(() => {
     requisicaoAtual.current++;
+
     setResultado(null);
     setErro('');
     setCarregando(false);
     setRevisando(null);
     setErrosRevisao({});
   }, []);
+  /* #endregion */
 
+  /* #region Retorno */
   return {
     resultado,
     carregando,
@@ -88,4 +128,6 @@ export function useMatchIA() {
     revisar,
     limpar,
   };
+  /* #endregion */
 }
+/* #endregion */

@@ -343,53 +343,57 @@
   /* #endregion */
 
   /* #region Componente Sidebar */
-  --sidebar-bg:                  var(--color-sidebar);
-  --sidebar-text:                var(--color-navigation-text);
-  --sidebar-border-color:        var(--color-navigation-border);
-  --sidebar-border-width:        var(--border-width);
+--sidebar-bg:                    var(--color-sidebar);
+--sidebar-text:                  var(--color-navigation-text);
+--sidebar-border-color:          var(--color-navigation-border);
+--sidebar-border-width:          var(--border-width);
 
-  --sidebar-brand-padding:       var(--spacing-4);
-  --sidebar-brand-gap:           var(--spacing-1);
-  --sidebar-brand-text:          var(--color-text-inverse);
-  --sidebar-brand-font-size:     var(--font-size-lg);
-  --sidebar-brand-font-weight:   700;
+--sidebar-brand-padding:         var(--spacing-4);
+--sidebar-brand-gap:             var(--spacing-1);
+--sidebar-brand-text:            var(--color-text-inverse);
+--sidebar-brand-font-size:       var(--font-size-lg);
+--sidebar-brand-font-weight:     700;
 
-  --sidebar-caption-font-family: var(--font-family-mono);
-  --sidebar-caption-font-size:   0.5625rem;
-  --sidebar-caption-spacing:     0.15em;
+/* texto: GESTÃO DE INOVAÇÃO */
+--sidebar-caption-font-family:   "Segoe UI", Arial, sans-serif;
+--sidebar-caption-font-size:     0.65rem;
+--sidebar-caption-spacing:       0.18em;
 
-  --sidebar-nav-padding:         var(--spacing-2);
-  --sidebar-nav-gap:             var(--spacing-1);
+--sidebar-nav-padding:           var(--spacing-2);
+--sidebar-nav-gap:               var(--spacing-1);
 
-  --sidebar-link-min-height:     2.25rem;
-  --sidebar-link-padding-y:      var(--spacing-2);
-  --sidebar-link-padding-x:      var(--spacing-3);
-  --sidebar-link-gap:            var(--spacing-3);
-  --sidebar-link-radius:         var(--border-radius);
-  --sidebar-link-font-size:      var(--font-size-sm);
-  --sidebar-link-line-height:    var(--line-height-normal);
-  --sidebar-link-bg:             transparent;
-  --sidebar-link-hover-bg:       var(--color-navigation-border);
+--sidebar-link-min-height:       2.25rem;
+--sidebar-link-padding-y:        var(--spacing-2);
+--sidebar-link-padding-x:        var(--spacing-3);
+--sidebar-link-gap:              var(--spacing-3);
+--sidebar-link-radius:           var(--border-radius);
+--sidebar-link-font-size:        var(--font-size-sm);
+--sidebar-link-line-height:      var(--line-height-normal);
+--sidebar-link-bg:               transparent;
+--sidebar-link-hover-bg:         var(--color-navigation-border);
 
-  --sidebar-active-bg:           var(--color-navigation-bg);
-  --sidebar-active-text:         var(--color-navigation-active);
+--sidebar-active-bg:             var(--color-navigation-bg);
+--sidebar-active-text:           var(--color-navigation-active);
 
-  --sidebar-icon-width:          1rem;
+--sidebar-icon-width:            1rem;
 
-  --sidebar-footer-padding:      1.25rem;
-  --sidebar-footer-gap:          var(--spacing-3);
+--sidebar-footer-padding:        1.25rem;
+--sidebar-footer-gap:            var(--spacing-3);
 
-  --sidebar-user-name-size:      var(--font-size-xs);
-  --sidebar-user-name-color:     var(--color-text-inverse);
-  --sidebar-user-description-size: 0.625rem;
-  --sidebar-user-description-font: var(--font-family-mono);
+/* nome: Lucas Analista */
+--sidebar-user-name-size:        0.875rem;
+--sidebar-user-name-color:       var(--color-text-inverse);
 
-  --sidebar-session-font-size:   var(--font-size-xs);
-  --sidebar-session-padding-y:   var(--spacing-2);
+/* texto: Analista · Hub de Inovação */
+--sidebar-user-description-size: 0.70rem;
+--sidebar-user-description-font: "Segoe UI", Arial, sans-serif;
 
-  --sidebar-toggle-padding:      var(--spacing-4);
-  --sidebar-focus-color:         var(--color-navigation-text);
-  /* #endregion */
+--sidebar-session-font-size:     var(--font-size-xs);
+--sidebar-session-padding-y:     var(--spacing-2);
+
+--sidebar-toggle-padding:        var(--spacing-4);
+--sidebar-focus-color:           var(--color-navigation-text);
+/* #endregion */
 
   /* #region Componente Layout */
   --layout-bg:                 var(--color-background);
@@ -407,6 +411,101 @@
   --layout-skip-font-size:     var(--font-size-sm);
   --layout-skip-z-index:       100;
   /* #endregion */
+
+
+/* ==========================================================
+   TOKENS RESPONSIVOS - ÓRBITA
+   Adicionar após o fechamento do :root original
+   ========================================================== */
+
+/* #region Tablet - até 1024px */
+@media (max-width: 1024px) {
+  :root {
+    /* Layout */
+    --layout-padding-x: var(--spacing-6);
+    --layout-padding-y: var(--spacing-6);
+
+    /* Seleção de perfil */
+    --profile-page-padding-y: var(--spacing-12);
+    --profile-grid-gap: var(--spacing-4);
+
+    /* Login */
+    --login-section-padding: var(--spacing-8);
+    --login-brand-gap: var(--spacing-4);
+  }
+}
+/* #endregion */
+
+
+/* #region Tablet pequeno e celular - até 768px */
+@media (max-width: 768px) {
+  :root {
+    /* Layout */
+    --layout-padding-x: var(--spacing-4);
+    --layout-padding-y: var(--spacing-4);
+    --layout-mobile-padding: var(--spacing-4);
+
+    /* Tipografia */
+    --font-size-brand: 2rem;
+
+    /* Login */
+    --login-section-padding: var(--spacing-6);
+    --login-mobile-padding: var(--spacing-4);
+    --login-brand-max-width: 100%;
+    --login-content-max-width: 100%;
+    --login-form-margin-top: var(--spacing-6);
+
+    /* Seleção de perfil */
+    --profile-page-padding-y: var(--spacing-8);
+    --profile-page-padding-x: var(--spacing-4);
+    --profile-grid-gap: var(--spacing-4);
+    --profile-grid-margin-top: var(--spacing-6);
+
+    /* Cards */
+    --profile-card-min-height: auto;
+
+    /* Sidebar */
+    --sidebar-width: 13.5rem;
+  }
+}
+/* #endregion */
+
+
+/* #region Celular pequeno - até 480px */
+@media (max-width: 480px) {
+  :root {
+    /* Layout */
+    --layout-padding-x: var(--spacing-3);
+    --layout-padding-y: var(--spacing-4);
+    --layout-mobile-padding: var(--spacing-3);
+
+    /* Tipografia */
+    --font-size-brand: 1.75rem;
+
+    /* Login */
+    --login-section-padding: var(--spacing-4);
+    --login-mobile-padding: var(--spacing-4);
+    --login-content-max-width: 100%;
+    --login-brand-gap: var(--spacing-3);
+    --login-form-gap: var(--spacing-3);
+
+    /* Seleção de perfil */
+    --profile-page-padding-y: var(--spacing-6);
+    --profile-page-padding-x: var(--spacing-3);
+    --profile-grid-gap: var(--spacing-3);
+
+    /* Cards */
+    --profile-card-padding: var(--spacing-4);
+    --profile-card-min-height: auto;
+
+    /* Formulários */
+    --input-min-height: 2.75rem;
+    --select-min-height: 2.75rem;
+    --button-min-height: 2.75rem;
+  }
+}
+/* #endregion */
+
 
 }
 

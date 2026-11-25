@@ -1,0 +1,302 @@
+.painel-avaliacao {
+  --painel-azul: var(--color-brand-blue, #102e5c);
+  --painel-texto: var(--color-text, #172b4d);
+  --painel-secundario: var(--color-text-secondary, #52647c);
+  --painel-borda: var(--color-border, #e2e8f0);
+  --painel-superficie: var(--color-surface, #fff);
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--painel-texto);
+}
+
+.painel-avaliacao *,
+.painel-avaliacao *::before,
+.painel-avaliacao *::after {
+  box-sizing: border-box;
+}
+
+.painel-avaliacao__header {
+  margin-bottom: 1.75rem;
+}
+
+.painel-avaliacao__header h1 {
+  margin: 0 0 0.4rem;
+  color: var(--painel-azul);
+  font-size: clamp(1.6rem, 2.35vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.painel-avaliacao__header p,
+.painel-avaliacao__card p {
+  margin: 0;
+  color: var(--painel-secundario);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.painel-avaliacao__header p {
+  font-size: 0.95rem;
+}
+
+.painel-avaliacao__indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.painel-avaliacao__card {
+  min-width: 0;
+  padding: 1.4rem;
+  background: var(--painel-superficie);
+  border: 1px solid var(--painel-borda);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgb(16 46 92 / 4%);
+}
+
+.painel-avaliacao__indicador {
+  --painel-acento: #2457a7;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-height: 10rem;
+  overflow: hidden;
+  padding-top: 1.65rem;
+}
+
+.painel-avaliacao__indicador::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--painel-acento);
+  content: '';
+}
+
+.painel-avaliacao__indicador--triagem {
+  --painel-acento: #c78a08;
+}
+
+.painel-avaliacao__indicador--projetos {
+  --painel-acento: #167a77;
+}
+
+.painel-avaliacao__indicador--mvp {
+  --painel-acento: #6356a8;
+}
+
+.painel-avaliacao__card h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.painel-avaliacao__indicador h2 {
+  color: var(--painel-secundario);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.painel-avaliacao__valor {
+  display: block;
+  color: var(--painel-azul);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.painel-avaliacao__valor span {
+  color: var(--painel-secundario);
+}
+
+.painel-avaliacao__detalhes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.painel-avaliacao__detalhe {
+  padding: 1.5rem;
+}
+
+.painel-avaliacao__secao-header {
+  margin-bottom: 1.35rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--painel-borda);
+}
+
+.painel-avaliacao__secao-header h2 {
+  color: var(--painel-azul);
+  font-size: 1.125rem;
+}
+
+.painel-avaliacao__secao-header p {
+  margin-top: 0.35rem;
+}
+
+.painel-avaliacao__fluxo,
+.painel-avaliacao__atividades {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.painel-avaliacao__fluxo li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 1.25fr);
+  align-items: center;
+  gap: 1rem;
+  color: var(--painel-secundario);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.painel-avaliacao__medicao {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.painel-avaliacao__trilho {
+  min-width: 0;
+  height: 0.75rem;
+  overflow: hidden;
+  background: var(--color-hover, #edf2f7);
+  border-radius: 999px;
+}
+
+.painel-avaliacao__barra {
+  height: 100%;
+  background: #2457a7;
+  border-radius: inherit;
+}
+
+.painel-avaliacao__medicao strong {
+  min-width: 1.5rem;
+  color: var(--painel-azul);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.painel-avaliacao__atividades {
+  gap: 0;
+}
+
+.painel-avaliacao__atividades li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--painel-borda);
+  font-size: 0.875rem;
+}
+
+.painel-avaliacao__atividades li:first-child {
+  padding-top: 0;
+}
+
+.painel-avaliacao__atividades li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.painel-avaliacao__atividades strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  overflow-wrap: anywhere;
+  font-weight: 650;
+}
+
+.painel-avaliacao__selo {
+  max-width: 7rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  background: #e8effa;
+  color: #173f7c;
+  font-size: 0.69rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.painel-avaliacao__periodo {
+  color: var(--painel-secundario);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.painel-avaliacao__estado,
+.painel-avaliacao__card .painel-avaliacao__estado {
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed var(--painel-borda);
+  border-radius: 10px;
+  color: var(--painel-secundario);
+  font-size: 0.875rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.painel-avaliacao__estado--erro {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+@media (max-width: 1100px) {
+  .painel-avaliacao__indicadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .painel-avaliacao__detalhes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .painel-avaliacao__indicadores {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .painel-avaliacao__card {
+    padding: 1rem;
+  }
+
+  .painel-avaliacao__indicador {
+    min-height: auto;
+    padding-top: 1.35rem;
+  }
+
+  .painel-avaliacao__fluxo li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+
+  .painel-avaliacao__atividades li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .painel-avaliacao__periodo {
+    grid-column: 2;
+    text-align: left;
+  }
+}

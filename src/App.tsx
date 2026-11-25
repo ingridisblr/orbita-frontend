@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 // Componentes comuns
@@ -19,9 +18,16 @@ import { MeusDesafios } from './pages/MeusDesafios';
 import { NovoDesafio } from './pages/NovoDesafio';
 import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
 
-// Página do Analista
+// Páginas do Analista
 import CadastrarUsuario from './pages/CadastrarUsuario';
 import { Match } from './pages/Match';
+import { PainelAvaliacao } from './pages/PainelAvaliacao';
+import { Triagem } from './pages/Triagem';
+import { ProjetosKanban } from './pages/ProjetosKanban';
+import { MVP } from './pages/MVP';
+import { Dashboard } from './pages/Dashboard';
+import { Resultados } from './pages/Resultados';
+import { Auditoria } from './pages/Auditoria';
 
 // Tipos
 import type { User, UserRole } from './types/auth';
@@ -214,6 +220,11 @@ export default function App() {
       )}
 
       {/* Página do Analista */}
+      {paginaAtual === 'painel-avaliacao' &&
+        user.role === 'analista' && (
+          <PainelAvaliacao />
+        )}
+
       {paginaAtual === 'cadastrar-usuario' &&
         user.role === 'analista' && (
           <CadastrarUsuario />
@@ -224,6 +235,30 @@ export default function App() {
           <Match user={user} />
         )}
 
+      {paginaAtual === 'triagem' && user.role === 'analista' && (
+        <Triagem />
+      )}
+
+      {paginaAtual === 'kanban' && user.role === 'analista' && (
+        <ProjetosKanban />
+      )}
+
+      {paginaAtual === 'mvp' && user.role === 'analista' && (
+        <MVP />
+      )}
+
+      {paginaAtual === 'dashboard' && (
+        <Dashboard user={user} />
+      )}
+
+      {paginaAtual === 'resultados' && (
+        <Resultados />
+      )}
+
+      {paginaAtual === 'auditoria' && user.role === 'analista' && (
+        <Auditoria />
+      )}
+
       {/* Páginas ainda não implementadas */}
       {![
         'desafios-abertos',
@@ -232,8 +267,15 @@ export default function App() {
         'meus-desafios',
         'novo-desafio',
         'ideias-relacionadas',
+        'painel-avaliacao',
         'cadastrar-usuario',
         'match',
+        'triagem',
+        'kanban',
+        'mvp',
+        'dashboard',
+        'resultados',
+        'auditoria',
       ].includes(paginaAtual) && (
         <main style={{ padding: '24px' }}>
           <h1>{pageTitles[paginaAtual]}</h1>

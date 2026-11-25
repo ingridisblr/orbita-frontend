@@ -1,6 +1,8 @@
+
 /* #region Importações */
 @import "./tokens.css";
 /* #endregion */
+
 
 /* #region Normalização */
 *,
@@ -9,8 +11,17 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  min-width: 320px;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
+  min-width: 320px;
+  width: 100%;
 }
 
 button,
@@ -22,30 +33,45 @@ select {
 
 img,
 svg {
-  display:   block;
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+video,
+canvas {
   max-width: 100%;
 }
 /* #endregion */
 
-/* #region Base da aplicação */
-html {
-  font-size:                16px;
-  -webkit-text-size-adjust: 100%;
-}
 
+/* #region Base da aplicação */
 body {
-  min-width:        320px;
   background-color: var(--color-background);
-  color:            var(--color-text);
-  font-family:      var(--font-family);
-  font-size:        var(--font-size-sm);
-  line-height:      var(--line-height-normal);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+
+  overflow-x: clip;
 }
 
 #root {
+  width: 100%;
+  min-width: 0;
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+#root > * {
+  min-width: 0;
 }
 /* #endregion */
+
 
 /* #region Tipografia */
 h1,
@@ -56,6 +82,7 @@ h5,
 h6,
 p {
   margin: 0;
+  overflow-wrap: break-word;
 }
 
 h1,
@@ -85,15 +112,18 @@ p {
 }
 /* #endregion */
 
+
 /* #region Links e botões */
 a {
-  color:                  inherit;
-  text-decoration:        underline;
-  text-underline-offset:  0.2em;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
 }
 
 button {
   cursor: pointer;
+  max-width: 100%;
 }
 
 button:disabled {
@@ -101,39 +131,280 @@ button:disabled {
 }
 /* #endregion */
 
+
 /* #region Formulários */
 input,
 textarea,
 select {
   color: var(--color-text);
+  max-width: 100%;
+  min-width: 0;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color:   var(--color-text-muted);
+  color: var(--color-text-muted);
   opacity: 1;
 }
 
 textarea {
   resize: vertical;
+  width: 100%;
 }
 /* #endregion */
 
+
 /* #region Acessibilidade */
 :focus-visible {
-  outline:        2px solid var(--color-focus);
+  outline: 2px solid var(--color-focus);
   outline-offset: 3px;
 }
 
 .sr-only {
-  position:    absolute;
-  width:       1px;
-  height:      1px;
-  padding:     0;
-  margin:      -1px;
-  overflow:    hidden;
-  clip-path:   inset(50%);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
-  border:      0;
+  border: 0;
+}
+/* #endregion */
+
+
+/* #region Tabelas responsivas */
+.table-responsive {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* #endregion */
+
+
+/* ==========================================================
+   RESPONSIVIDADE GLOBAL
+   ========================================================== */
+
+
+/* #region Desktop intermediário - até 1200px */
+@media (max-width: 1200px) {
+
+  h1 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+  }
+
+  h2 {
+    font-size: var(--font-size-lg);
+  }
+
+}
+/* #endregion */
+
+
+/* #region Tablets - até 1024px */
+@media (max-width: 1024px) {
+
+  h1 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+
+  h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  h3 {
+    font-size: var(--font-size-md);
+  }
+
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+  }
+
+}
+/* #endregion */
+
+
+/* #region Celulares e tablets pequenos - até 768px */
+@media (max-width: 768px) {
+
+  body {
+    font-size: var(--font-size-sm);
+  }
+
+  h1 {
+    font-size: 1.375rem;
+  }
+
+  h2 {
+    font-size: 1.125rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+  }
+
+  textarea {
+    width: 100%;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+}
+/* #endregion */
+
+
+/* #region Celulares pequenos - até 480px */
+@media (max-width: 480px) {
+
+  body {
+    font-size: var(--font-size-sm);
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.0625rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  p {
+    line-height: var(--line-height-relaxed);
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  button {
+    max-width: 100%;
+  }
+
+  img,
+  svg,
+  video {
+    max-width: 100%;
+  }
+
+}
+/* #endregion */
+
+
+/* #region Preferências de movimento */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+}
+/* #endregion */
+
+/* bloco da marca/logo */
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sidebar-brand-gap);
+  padding: var(--sidebar-brand-padding);
+}
+
+/* GESTÃO DE INOVAÇÃO */
+.sidebar-caption {
+  font-family: var(--sidebar-caption-font-family);
+  font-size: var(--sidebar-caption-font-size);
+  letter-spacing: var(--sidebar-caption-spacing);
+  color: var(--sidebar-text);
+  text-transform: uppercase;
+}
+
+/* bloco do usuário no rodapé */
+.sidebar-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+/* Lucas Analista */
+.sidebar-user-name {
+  width: 100%;
+  text-align: center;
+  font-size: var(--sidebar-user-name-size);
+  color: var(--sidebar-user-name-color);
+  font-weight: 600;
+}
+
+/* Analista · Hub de Inovação */
+.sidebar-user-description {
+  width: 100%;
+  text-align: center;
+  font-family: var(--sidebar-user-description-font);
+  font-size: var(--sidebar-user-description-size);
+  color: var(--sidebar-text);
+  line-height: 1.4;
+}
+
+/* Analista · Hub de Inovação */
+.sidebar-user-description {
+  width: 100%;
+  text-align: center;
+  font-family: var(--sidebar-user-description-font);
+  font-size: var(--sidebar-user-description-size);
+  color: var(--sidebar-text);
+  line-height: 1.4;
+}
+
+/* #region Títulos das páginas do ÓRBITA */
+#root h1 {
+  margin: 0 0 0.4rem;
+  color: var(--color-brand-blue, #102e5c);
+  font-family: var(--font-family, "Segoe UI", Arial, sans-serif);
+  font-size: clamp(1.6rem, 2.35vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+#root h1 + p {
+  margin: 0;
+  color: var(--color-text-secondary, #52647c);
+  font-size: 0.95rem;
+  line-height: 1.55;
 }
 /* #endregion */

@@ -1,11 +1,11 @@
-// #region Perfis
+/* #region Perfis */
 export type UserRole =
   | 'colaborador'
   | 'gestor'
   | 'analista';
-// #endregion
+/* #endregion */
 
-// #region Usuário
+/* #region Usuário */
 export interface User {
   id: string;
   name: string;
@@ -13,16 +13,16 @@ export interface User {
   role: UserRole;
   area: string;
 }
-// #endregion
+/* #endregion */
 
-// #region Credenciais
+/* #region Credenciais */
 export interface LoginCredentials {
   email: string;
   password: string;
 }
-// #endregion
+/* #endregion */
 
-// #region Perfil de demonstração
+/* #region Perfil de demonstração */
 export interface DemoProfile {
   role: UserRole;
   title: string;
@@ -31,4 +31,4 @@ export interface DemoProfile {
   permissions: string[];
   restrictions: string[];
 }
-// #endregion
+/* #endregion */

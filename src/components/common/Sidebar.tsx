@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
+import { LogOut, ArrowLeftRight } from 'lucide-react';
 import type { User } from '../../types/auth';
 import logoOrbita from '../../assets/logo-orbita-sidebar.png';
 import './Sidebar.css';
 
-
-
+// #region Tipos
 export type NavigationItemId =
   | 'desafios-abertos'
   | 'propor-ideia'
@@ -42,31 +41,31 @@ interface SidebarProps {
 const menus: Record<User['role'], NavigationItem[]> = {
   colaborador: [
     { id: 'desafios-abertos', label: 'Desafios Abertos', icon: '◈' },
-    { id: 'propor-ideia',     label: 'Propor Ideia',     icon: '◎' },
-    { id: 'minhas-ideias',    label: 'Minhas Ideias',    icon: '◐' },
+    { id: 'propor-ideia', label: 'Propor Ideia', icon: '◎' },
+    { id: 'minhas-ideias', label: 'Minhas Ideias', icon: '◐' },
   ],
   gestor: [
-    { id: 'meus-desafios',      label: 'Meus Desafios',      icon: '◈' },
-    { id: 'novo-desafio',       label: 'Novo Desafio',       icon: '+' },
+    { id: 'meus-desafios', label: 'Meus Desafios', icon: '◈' },
+    { id: 'novo-desafio', label: 'Novo Desafio', icon: '+' },
     { id: 'ideias-relacionadas', label: 'Ideias Relacionadas', icon: '◎' },
   ],
   analista: [
-    { id: 'painel-avaliacao', label: 'Painel de Avaliação',    icon: '◧' },
-    { id: 'match',            label: 'Match',                 icon: '⇄' },
-    { id: 'triagem',          label: 'Triagem / Priorização',  icon: '▦' },
-    { id: 'kanban',           label: 'Projetos / Kanban',      icon: '▤' },
-    { id: 'mvp',              label: 'MVP',                   icon: '◎' },
-    { id: 'dashboard',        label: 'Dashboard',             icon: '▣' },
-    { id: 'resultados',       label: 'Resultados',            icon: '◐' },
-    { id: 'auditoria',        label: 'Auditoria',             icon: '⬡' },
+    { id: 'painel-avaliacao', label: 'Painel de Avaliação', icon: '◧' },
+    { id: 'match', label: 'Match', icon: '⇄' },
+    { id: 'triagem', label: 'Triagem / Priorização', icon: '▦' },
+    { id: 'kanban', label: 'Projetos / Kanban', icon: '▤' },
+    { id: 'mvp', label: 'MVP', icon: '◎' },
+    { id: 'dashboard', label: 'Dashboard', icon: '▣' },
+    { id: 'resultados', label: 'Resultados', icon: '◐' },
+    { id: 'auditoria', label: 'Auditoria', icon: '⬡' },
     { id: 'cadastrar-usuario', label: 'Cadastrar Usuário', icon: '+' },
   ],
 };
 
 const roleNames: Record<User['role'], string> = {
   colaborador: 'Colaborador',
-  gestor:      'Gestor Demandante',
-  analista:    'Analista',
+  gestor: 'Gestor Demandante',
+  analista: 'Analista',
 };
 // #endregion
 
@@ -83,13 +82,13 @@ export function Sidebar({
   // #endregion
 
   // #region Eventos
-    function handleNavigate(item: NavigationItemId) {
+  function handleNavigate(item: NavigationItemId) {
     onNavigate(item);
     setMenuExpanded(false);
   }
   // #endregion
 
-   // #region Renderização
+  // #region Renderização
   return (
     <aside className="sidebar">
       {/* #region Identidade */}
@@ -156,7 +155,9 @@ export function Sidebar({
       {/* #region Usuário e sessão */}
       <footer className="sidebar__footer">
         <div className="sidebar__user">
-          <p className="sidebar__user-name">{user.name}</p>
+          <p className="sidebar__user-name">
+            {user.name}
+          </p>
 
           <p className="sidebar__user-description">
             {roleNames[user.role]} · {user.area}
@@ -168,15 +169,17 @@ export function Sidebar({
           className="sidebar__session-action"
           onClick={onSwitchProfile}
         >
-  
+          <ArrowLeftRight size={18} aria-hidden="true" />
+          <span>Trocar perfil</span>
         </button>
 
         <button
           type="button"
-          className="sidebar__session-action"
+          className="sidebar__session-action sidebar__session-action--logout"
           onClick={onLogout}
         >
-          Sair
+          <LogOut size={18} aria-hidden="true" />
+          <span>Sair</span>
         </button>
       </footer>
       {/* #endregion */}

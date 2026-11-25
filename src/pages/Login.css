@@ -1,117 +1,113 @@
-/* #region Layout */
 .login {
-  display:               grid;
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-
   min-height: 100vh;
-
-  background-color: var(--login-panel-bg);
+  background: var(--login-panel-bg, #f8fafc);
 }
 
 .login__brand,
 .login__panel {
-  display:     grid;
+  display: grid;
   place-items: center;
-
   min-width: 0;
-  padding:   var(--login-section-padding);
+  padding: var(--login-section-padding, 2rem);
 }
-/* #endregion */
 
-/* #region Apresentação */
 .login__brand {
-  background-color: var(--login-brand-bg);
-  color:            var(--login-brand-text);
+  background: var(--login-brand-bg, #102e5c);
+  color: var(--login-brand-text, #fff);
 }
 
 .login__brand-content {
-  display:        flex;
-  flex-direction: column;
-  align-items:    center;
-  gap:            var(--login-brand-gap);
-
-  width:     100%;
-  max-width: var(--login-brand-max-width);
+  display: grid;
+  justify-items: center;
+  gap: var(--login-brand-gap, 1.25rem);
+  width: 100%;
+  max-width: var(--login-brand-max-width, 28rem);
 }
 
 .login__logo {
   display: block;
-
-  width:     var(--login-logo-width);
+  width: var(--login-logo-width, 16rem);
   max-width: 100%;
-  height:    auto;
-
-  object-fit: contain;
+  height: auto;
 }
 
 .login__description {
-  color:       var(--login-secondary-text);
-  font-size:   var(--login-description-size);
-  line-height: var(--login-description-height);
-  text-align:  center;
-}
-/* #endregion */
-
-/* #region Formulário */
-.login__panel {
-  background-color: var(--login-panel-bg);
+  margin: 0;
+  color: var(--login-secondary-text, inherit);
+  font-size: var(--login-description-size, 0.95rem);
+  line-height: var(--login-description-height, 1.6);
+  text-align: center;
 }
 
 .login__form-container {
-  width:     100%;
-  max-width: var(--login-content-max-width);
-}
-
-.login__header {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--login-header-gap);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--login-content-max-width, 26rem);
+  padding: clamp(1rem, 4vw, 1.5rem);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
 .login__header h1 {
-  color:     var(--login-heading-text);
-  font-size: var(--login-heading-size);
+  margin: 0 0 0.25rem;
+  color: var(--login-heading-text, #0f172a);
+  font-size: 1.8rem;
 }
 
 .login__header p {
-  color:     var(--login-description-text);
-  font-size: var(--login-description-size);
+  margin: 0;
+  color: var(--login-description-text, #475569);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .login__form {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--login-form-gap);
-
-  margin-top: var(--login-form-margin-top);
+  display: grid;
+  gap: var(--login-form-gap, 1rem);
+  margin-top: var(--login-form-margin-top, 1rem);
 }
 
 .login__submit {
   width: 100%;
+  min-height: 2.75rem;
+}
+
+.login__form :is(input, button):focus-visible {
+  outline: 2px solid var(--color-focus, #2457a7);
+  outline-offset: 2px;
 }
 
 .login__demo-notice,
 .login__help {
-  color:      var(--login-description-text);
-  font-size:  var(--login-help-font-size);
+  margin: 0;
+  color: var(--login-description-text, #475569);
+  font-size: var(--login-help-font-size, 0.875rem);
+  line-height: 1.5;
   text-align: center;
 }
 
-.login__help {
-  margin-top: var(--login-help-margin-top);
+.login__demo-notice {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
 }
-/* #endregion */
 
-/* #region Responsividade */
+.login__help {
+  margin-top: var(--login-help-margin-top, 1rem);
+}
+
 @media (max-width: 48rem) {
   .login {
     grid-template-columns: minmax(0, 1fr);
-    align-content:         center;
+    align-content: start;
   }
 
   .login__brand,
   .login__panel {
-    padding: var(--login-mobile-padding);
+    padding: var(--login-mobile-padding, 1rem);
   }
 }
-/* #endregion */

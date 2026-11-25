@@ -122,6 +122,8 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
           <p className="login__help">
             Problema de acesso? Contate o administrador do sistema.
           </p>
+          <p>analista@gmail.com | gestor@orbita.com | colaborador@orbita.com</p>
+          <p>Senha: 123456</p>
         </div>
       </section>
       {/* #endregion */}
