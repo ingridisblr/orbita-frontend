@@ -19,6 +19,7 @@ export function SugestoesIa({ desafios, onAtualizado }: SugestoesIaProps) {
     resultado,
     carregando,
     erro,
+    segundosEspera,
     revisando,
     errosRevisao,
     sugerir,
@@ -38,8 +39,10 @@ export function SugestoesIa({ desafios, onAtualizado }: SugestoesIaProps) {
   }
 
   async function handleSugerir() {
-    await sugerir(desafioId);
-    onAtualizado?.();
+    // Só recarrega a tela se a IA respondeu. Recarregar depois de uma
+    // falha dispara mais requisições e agrava o limite de taxa.
+    const ok = await sugerir(desafioId);
+    if (ok) onAtualizado?.();
   }
 
   return (
@@ -63,10 +66,12 @@ export function SugestoesIa({ desafios, onAtualizado }: SugestoesIaProps) {
         <Button
           isLoading={carregando}
           loadingText="Consultando a IA..."
-          disabled={!desafioId}
+          disabled={!desafioId || segundosEspera > 0}
           onClick={handleSugerir}
         >
-          Sugerir ideias com IA
+          {segundosEspera > 0
+            ? `Aguarde ${segundosEspera} s`
+            : 'Sugerir ideias com IA'}
         </Button>
       </div>
 
@@ -96,8 +101,12 @@ export function SugestoesIa({ desafios, onAtualizado }: SugestoesIaProps) {
                     revisando={revisando === sugestao.matchId}
                     erroRevisao={errosRevisao[sugestao.matchId]}
                     onRevisar={async (decisao, justificativa) => {
-                      await revisar(sugestao.matchId, decisao, justificativa);
-                      onAtualizado?.();
+                      const ok = await revisar(
+                        sugestao.matchId,
+                        decisao,
+                        justificativa
+                      );
+                      if (ok) onAtualizado?.();
                     }}
                   />
                 ))}
