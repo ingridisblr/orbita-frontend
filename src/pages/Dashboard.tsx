@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { listarDesafios } from '../services/desafioService';
 import { listarTodasIdeias } from '../services/ideiaService';
 import { listarTodosMatches } from '../services/matchService';
+import { etapasProjeto, listarProjetos, type ProjetoApi } from '../services/projetoService';
 import type { User } from '../types/auth';
 import type { Desafio } from '../types/desafio';
 import type { Ideia } from '../types/ideia';
@@ -21,12 +22,14 @@ interface DadosDashboard {
   desafios: Desafio[] | null;
   ideias: Ideia[] | null;
   matches: Match[] | null;
+  projetos: ProjetoApi[] | null;
 }
 
 const dadosIniciais: DadosDashboard = {
   desafios: null,
   ideias: null,
   matches: null,
+  projetos: null,
 };
 
 function normalizar(texto: string) {
@@ -91,29 +94,30 @@ export function Dashboard({ user }: DashboardProps) {
   useEffect(() => {
     let ativo = true;
 
-    setCarregando(true);
-    setDados(dadosIniciais);
-    setErros([]);
-
     async function carregar() {
-      const [desafios, ideias, matches] = await Promise.allSettled([
+      const [desafios, ideias, matches, projetos] = await Promise.allSettled([
         listarDesafios(),
         listarTodasIdeias(),
         user.role === 'analista' ? listarTodosMatches() : Promise.resolve(null),
+        listarProjetos(),
       ] as const);
 
       if (!ativo) return;
 
       setDados({
-        desafios: desafios.status === 'fulfilled' ? desafios.value : null,
+        desafios: desafios.status === 'fulfilled'
+          ? desafios.value.filter((item) => user.role !== 'gestor' || item.responsavelId === user.id)
+          : null,
         ideias: ideias.status === 'fulfilled' ? ideias.value : null,
         matches: matches.status === 'fulfilled' ? matches.value : null,
+        projetos: projetos.status === 'fulfilled' ? projetos.value : null,
       });
 
       const falhas = [
         { nome: 'desafios', resultado: desafios },
         { nome: 'ideias', resultado: ideias },
         { nome: 'vínculos Match', resultado: matches },
+        { nome: 'projetos', resultado: projetos },
       ].filter(({ resultado }) => resultado.status === 'rejected');
 
       setErros(falhas.map(({ nome }) => nome));
@@ -127,8 +131,8 @@ export function Dashboard({ user }: DashboardProps) {
     };
   }, [user.id, user.role]);
 
-  const { desafios, ideias, matches } = dados;
-  const ideiasEmTriagem = ideias?.filter((ideia) => normalizar(ideia.status) === 'em triagem');
+  const { desafios, ideias, matches, projetos } = dados;
+  const ideiasEmTriagem = ideias?.filter((ideia) => ['em triagem', 'em avaliacao'].includes(normalizar(ideia.status)));
   const desafiosAtivos = desafios?.filter((desafio) => ['ativo', 'aberto'].includes(normalizar(desafio.status))).length;
   const idsDesafios = desafios ? new Set(desafios.map((desafio) => desafio.id)) : null;
 
@@ -141,7 +145,7 @@ export function Dashboard({ user }: DashboardProps) {
     { titulo: 'Desafios ativos', valor: desafiosAtivos ?? null, descricao: 'Abertos ou ativos', tipo: 'desafios' },
     { titulo: 'Ideias registradas', valor: ideias?.length ?? null, descricao: 'Ideias visíveis ao perfil', tipo: 'ideias' },
     { titulo: 'Em triagem', valor: ideiasEmTriagem?.length ?? null, descricao: 'Aguardando avaliação', tipo: 'triagem' },
-    { titulo: 'Projetos em andamento', valor: null, descricao: 'Integração pendente', tipo: 'projetos' },
+    { titulo: 'Projetos em andamento', valor: projetos?.filter((item) => item.status_kanban !== 'Concluído').length ?? null, descricao: 'Projetos visíveis ao perfil', tipo: 'projetos' },
   ];
 
   const statusDesafios = agruparRegistros(desafios, (desafio) =>
@@ -155,10 +159,8 @@ export function Dashboard({ user }: DashboardProps) {
     { titulo: 'Após Match', valor: contarDesafiosVinculados(matches?.filter((match) => normalizar(match.status_match) === 'validado').map((match) => String(match.id_desafio)) ?? null) },
     { titulo: 'Em triagem', valor: contarDesafiosVinculados(ideiasEmTriagem?.map((ideia) => ideia.desafioId) ?? null) },
     { titulo: 'Aprovados', valor: contarDesafiosVinculados(ideias?.filter((ideia) => normalizar(ideia.status) === 'aprovada').map((ideia) => ideia.desafioId) ?? null) },
-    { titulo: 'Concluídos', valor: null },
+    { titulo: 'Concluídos', valor: contarDesafiosVinculados(projetos?.flatMap((item) => item.status_kanban === 'Concluído' && item.id_desafio !== null ? [String(item.id_desafio)] : []) ?? null) },
   ];
-
-  const etapasProjetos = ['Planejamento', 'Em Desenvolvimento', 'Em Teste', 'Concluído'];
 
   return (
     <div className="dashboard-page" aria-busy={carregando}>
@@ -202,12 +204,12 @@ export function Dashboard({ user }: DashboardProps) {
         <section className="dashboard-page__card" aria-labelledby="dashboard-projetos">
           <header className="dashboard-page__card-header">
             <h2 id="dashboard-projetos">Projetos por Status</h2>
-            <p>Os totais dependem da integração de projetos.</p>
+            <p>Projetos visíveis ao perfil.</p>
           </header>
           <div className="dashboard-page__projetos">
-            {etapasProjetos.map((etapa) => (
+            {etapasProjeto.map((etapa) => (
               <div key={etapa}>
-                <strong aria-label="Indisponível">—</strong>
+                <strong>{projetos?.filter((item) => item.status_kanban === etapa).length ?? '—'}</strong>
                 <span>{etapa}</span>
               </div>
             ))}

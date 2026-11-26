@@ -232,7 +232,10 @@
 
 .ideias-relacionadas-page__card-footer {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.6rem;
   margin-top: 0.9rem;
   padding-top: 0.65rem;
   border-top: 1px solid var(--ir-borda);
@@ -259,6 +262,11 @@
   inset: 0;
   border-radius: 14px;
   cursor: pointer;
+}
+
+.ideias-relacionadas-page__acao {
+  position: relative;
+  z-index: 1;
 }
 
 .ideias-relacionadas-page__abrir:focus-visible {
@@ -290,6 +298,16 @@
   background: #fef2f2;
   color: #991b1b;
   border-color: #fecaca;
+}
+
+.ideias-relacionadas-page__estado--sucesso {
+  background: #e7f5ed;
+  color: #17633d;
+  border-color: #b8ddc8;
+}
+
+.ideias-relacionadas-page__estado > button {
+  margin-inline-start: 0.75rem;
 }
 
 .ideias-relacionadas-page__modal {
@@ -405,12 +423,19 @@
   cursor: pointer;
 }
 
-.ideias-relacionadas-page__modal button:hover {
+.ideias-relacionadas-page__modal button:hover,
+.ideias-relacionadas-page__btn:hover:not(:disabled) {
   background: #f1f5f9;
 }
-.ideias-relacionadas-page__modal button:focus-visible {
+.ideias-relacionadas-page__modal button:focus-visible,
+.ideias-relacionadas-page__btn:focus-visible {
   outline: 2px solid var(--color-focus, #2457a7);
   outline-offset: 2px;
+}
+
+.ideias-relacionadas-page__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 @media (max-width: 600px) {

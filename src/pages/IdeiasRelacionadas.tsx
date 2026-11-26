@@ -1,16 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
-import { consultarIdeia, listarIdeias } from '../services/ideiaService';
+import { consultarDesafio, listarDesafios } from '../services/desafioService';
+import {
+  aceitarIdeia,
+  arquivarIdeia,
+  consultarIdeia,
+  listarTodasIdeias,
+  rejeitarIdeia,
+} from '../services/ideiaService';
 import type { Ideia } from '../types/ideia';
 import './IdeiasRelacionadas.css';
 
 interface IdeiasRelacionadasProps {
   desafioId?: string;
-  onVoltarParaMeusDesafios?: () => void;
+  gestorId?: string;
 }
+
+const statusParaDecisao = new Set(['submetida', 'nova', 'em_avaliacao', 'em avaliação']);
+const acoes = {
+  aceitar: { rotulo: 'Aceitar', executar: aceitarIdeia, sucesso: 'Ideia aceita.' },
+  rejeitar: { rotulo: 'Rejeitar', executar: rejeitarIdeia, sucesso: 'Ideia rejeitada.' },
+  arquivar: { rotulo: 'Arquivar', executar: arquivarIdeia, sucesso: 'Ideia arquivada.' },
+};
 
 function classeStatus(status: string) {
   switch (status.trim().toLowerCase()) {
     case 'aprovada':
+    case 'aceita':
       return 'aprovada';
     case 'em match':
     case 'em triagem':
@@ -23,10 +38,16 @@ function classeStatus(status: string) {
   }
 }
 
-export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
+export const IdeiasRelacionadas = ({ desafioId, gestorId }: IdeiasRelacionadasProps) => {
   const [ideias, setIdeias] = useState<Ideia[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [erroAcao, setErroAcao] = useState('');
+  const [sucesso, setSucesso] = useState('');
+  const [acaoPendente, setAcaoPendente] = useState(false);
+  const [revisao, setRevisao] = useState(0);
+  const [desafiosDoGestor, setDesafiosDoGestor] = useState(new Set<string>());
+  const [erroPermissoes, setErroPermissoes] = useState(false);
   const [ideiaSelecionada, setIdeiaSelecionada] = useState<Ideia | null>(null);
   const [detalhes, setDetalhes] = useState<Ideia | null>(null);
   const [carregandoDetalhes, setCarregandoDetalhes] = useState(false);
@@ -37,12 +58,30 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
 
   useEffect(() => {
     let ativo = true;
-    setCarregando(true);
-    setErro('');
+    listarTodasIdeias({ desafioId })
+      .then(async (resultado) => {
+        if (!ativo) return;
+        setIdeias(resultado);
+        if (!gestorId) return;
 
-    listarIdeias({ desafioId })
-      .then((resultado) => {
-        if (ativo) setIdeias(resultado);
+        try {
+          const responsavelPor = new Set<string>();
+          if (resultado.length && desafioId) {
+            const desafio = await consultarDesafio(desafioId);
+            if (String(desafio.id_responsavel) === gestorId) responsavelPor.add(String(desafio.id_desafio));
+          } else if (resultado.some((ideia) => ideia.desafioId)) {
+            const desafios = await listarDesafios();
+            for (const desafio of desafios) {
+              if (desafio.responsavelId === gestorId) responsavelPor.add(desafio.id);
+            }
+          }
+          if (ativo) setDesafiosDoGestor(responsavelPor);
+        } catch {
+          if (ativo) {
+            setDesafiosDoGestor(new Set());
+            setErroPermissoes(true);
+          }
+        }
       })
       .catch((error: unknown) => {
         if (ativo) {
@@ -60,7 +99,48 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
     return () => {
       ativo = false;
     };
-  }, [desafioId]);
+  }, [desafioId, gestorId, revisao]);
+
+  function podeExecutar(ideia: Ideia, acao: keyof typeof acoes) {
+    if (!gestorId || !ideia.id) return false;
+
+    const status = ideia.status.trim().toLowerCase().replace(/-/g, '_');
+    const responsavel = desafiosDoGestor.has(ideia.desafioId);
+
+    if (acao === 'arquivar') {
+      return status !== 'arquivada' && (responsavel || ideia.usuarioId === gestorId);
+    }
+
+    return responsavel && statusParaDecisao.has(status);
+  }
+
+  async function executarAcao(ideia: Ideia, acao: keyof typeof acoes) {
+    if (acaoPendente || carregando || erro || !podeExecutar(ideia, acao)) return;
+
+    const { rotulo, executar, sucesso: mensagem } = acoes[acao];
+    if (!window.confirm(`${rotulo} a ideia “${ideia.titulo}”?`)) return;
+
+    setAcaoPendente(true);
+    setErroAcao('');
+    setSucesso('');
+
+    try {
+      await executar(ideia.id);
+      setSucesso(mensagem);
+      recarregarLista();
+    } catch (error) {
+      setErroAcao(error instanceof Error ? error.message : 'Não foi possível alterar o status da ideia.');
+    } finally {
+      setAcaoPendente(false);
+    }
+  }
+
+  function recarregarLista() {
+    setCarregando(true);
+    setErro('');
+    setErroPermissoes(false);
+    setRevisao((atual) => atual + 1);
+  }
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -141,8 +221,10 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
           i
         </span>
         <p>
-          A avaliação, triagem e aprovação das ideias é realizada pelo
-          Analista/Hub de Inovação. Sua função é acompanhar o andamento.
+          O Gestor Demandante pode aceitar ou rejeitar ideias dos desafios sob
+          sua responsabilidade e arquivar ideias desses desafios ou de sua
+          autoria. O Analista/Hub de Inovação continua responsável pela
+          avaliação, triagem e aprovação das ideias.
         </p>
       </div>
 
@@ -151,12 +233,27 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
           Carregando ideias...
         </p>
       )}
-      {erro && (
+      {sucesso && (
+        <p className="ideias-relacionadas-page__estado ideias-relacionadas-page__estado--sucesso" role="status">
+          {sucesso}
+        </p>
+      )}
+      {(erro || erroAcao || erroPermissoes) && (
         <p
           className="ideias-relacionadas-page__estado ideias-relacionadas-page__estado--erro"
           role="alert"
         >
-          {erro}
+          {erro || erroAcao || 'Não foi possível verificar a responsabilidade por todos os desafios.'}
+          {(erro || erroPermissoes) && (
+            <button
+              type="button"
+              className="ideias-relacionadas-page__btn"
+              disabled={carregando || acaoPendente}
+              onClick={recarregarLista}
+            >
+              Atualizar lista
+            </button>
+          )}
         </p>
       )}
       {!carregando && !erro && ideias.length === 0 && (
@@ -223,6 +320,20 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
               )}
 
               <footer className="ideias-relacionadas-page__card-footer">
+                {(Object.keys(acoes) as (keyof typeof acoes)[])
+                  .filter((acao) => podeExecutar(ideia, acao))
+                  .map((acao) => (
+                    <button
+                      key={acao}
+                      type="button"
+                      className="ideias-relacionadas-page__btn ideias-relacionadas-page__acao"
+                      disabled={acaoPendente || carregando || Boolean(erro)}
+                      onClick={() => void executarAcao(ideia, acao)}
+                      aria-label={`${acoes[acao].rotulo} a ideia ${ideia.titulo}`}
+                    >
+                      {acoes[acao].rotulo}
+                    </button>
+                  ))}
                 <button
                   type="button"
                   className="ideias-relacionadas-page__abrir"
@@ -323,6 +434,10 @@ export const IdeiasRelacionadas = ({ desafioId }: IdeiasRelacionadasProps) => {
               <div className="ideias-relacionadas-page__modal-campo-largo">
                 <dt>Descrição da solução proposta</dt>
                 <dd>{obterCampo('descricao') || 'Não informada'}</dd>
+              </div>
+              <div className="ideias-relacionadas-page__modal-campo-largo">
+                <dt>Problema que a ideia resolve</dt>
+                <dd>{obterCampo('problemaResolvido') || 'Não informado'}</dd>
               </div>
               <div className="ideias-relacionadas-page__modal-campo-largo">
                 <dt>Benefício esperado</dt>

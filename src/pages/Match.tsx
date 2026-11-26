@@ -8,7 +8,9 @@ import {
   criarMatch,
   listarDesafiosParaMatch,
   listarTodosMatches,
+  sugerirMatchesPorRegra,
 } from '../services/matchService';
+import { revisarMatch } from '../services/matchIaService';
 import type { User } from '../types/auth';
 import type { Desafio } from '../types/desafio';
 import type { Ideia } from '../types/ideia';
@@ -61,6 +63,9 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
   const [erroForm, setErroForm] = useState('');
   const [sucesso, setSucesso] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [revisando, setRevisando] = useState(false);
+  const [mensagemRevisao, setMensagemRevisao] = useState('');
+  const [erroRevisao, setErroRevisao] = useState('');
 
   // Filtro da lista de vínculos
   const [filtroDesafio, setFiltroDesafio] = useState(TODOS);
@@ -72,6 +77,45 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
   const enviandoRef = useRef(false); // trava síncrona contra clique duplo
 
   const ehAnalista = user.role === 'analista';
+
+  async function decidirVinculo(match: MatchVinculo, decisao: 'validar' | 'descartar') {
+    if (revisando) return;
+    const motivo = decisao === 'descartar' ? window.prompt('Informe o motivo do descarte:') : undefined;
+    if (motivo === null || (decisao === 'validar' && !window.confirm('Validar este vínculo?'))) return;
+    setRevisando(true);
+    setErroRevisao('');
+    setMensagemRevisao('');
+    try {
+      const status = await revisarMatch(String(match.id_match), decisao, motivo);
+      setMatches((atuais) => atuais.map((item) => item.id_match === match.id_match ? { ...item, status_match: status } : item));
+      setMensagemRevisao(decisao === 'validar' ? 'Vínculo validado.' : 'Vínculo descartado.');
+      try {
+        setMatches(await listarTodosMatches());
+      } catch {
+        setErroRevisao('A decisão foi registrada. Não foi possível atualizar os detalhes da lista.');
+      }
+    } catch (error) {
+      setErroRevisao(descreverErro(error));
+    } finally {
+      setRevisando(false);
+    }
+  }
+
+  async function sugerirPorRegra() {
+    if (!idDesafio || salvando) return;
+    setSalvando(true);
+    setErroForm('');
+    setSucesso('');
+    try {
+      const { sugestoes } = await sugerirMatchesPorRegra(Number(idDesafio));
+      setMatches((atuais) => [...sugestoes, ...atuais]);
+      setSucesso(sugestoes.length ? `${sugestoes.length} sugestões registradas para revisão.` : 'Nenhuma sugestão encontrada por regras.');
+    } catch (error) {
+      setErroForm(descreverErro(error));
+    } finally {
+      setSalvando(false);
+    }
+  }
 
   // Carga inicial: ideias, desafios e vínculos existentes
   useEffect(() => {
@@ -380,6 +424,9 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
           </section>
 
           <SugestoesIa desafios={desafios} onAtualizado={recarregarMatches} />
+          <Button type="button" disabled={!idDesafio || salvando} onClick={sugerirPorRegra}>
+            Sugerir por regras para o desafio selecionado
+          </Button>
 
           {/* Listagem de ideias e desafios */}
           <section className="match-card" aria-labelledby="match-catalogo-titulo">
@@ -562,6 +609,8 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
             )}
 
             <div className="match-lista">
+              {mensagemRevisao && <p role="status">{mensagemRevisao}</p>}
+              {erroRevisao && <p role="alert">{erroRevisao}</p>}
               {matchesFiltrados.map((match) => (
                 <article key={match.id_match} className="match-item">
                   <div className="match-item-topo">
@@ -594,6 +643,12 @@ export const Match: React.FC<MatchProps> = ({ user }) => {
                     {match.score_compatibilidade !== null &&
                       ` · Compatibilidade ${match.score_compatibilidade}`}
                   </p>
+                  {match.status_match === 'PENDENTE' && (
+                    <div>
+                      <Button type="button" disabled={revisando} onClick={() => void decidirVinculo(match, 'validar')}>Validar vínculo</Button>
+                      <Button type="button" disabled={revisando} onClick={() => void decidirVinculo(match, 'descartar')}>Descartar vínculo</Button>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>

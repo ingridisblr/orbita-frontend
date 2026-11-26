@@ -20,7 +20,7 @@ export async function apiRequest<T>(
   let resposta: Response;
 
   try {
-    resposta = await fetch(`${API_URL}${endpoint}`, {
+    resposta = await fetch(`${API_URL.replace(/\/+$/, '')}${endpoint}`, {
       ...options,
       headers,
     });

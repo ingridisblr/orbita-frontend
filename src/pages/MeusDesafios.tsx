@@ -4,13 +4,17 @@ import type { Desafio } from '../types/desafio';
 import './MeusDesafios.css';
 
 interface MeusDesafiosProps {
+  gestorId: string;
   onIrParaNovoDesafio: () => void;
   onIrParaIdeias?: (desafioId: string) => void;
+  onEditar: (desafio: Desafio) => void;
 }
 
 export const MeusDesafios = ({
+  gestorId,
   onIrParaNovoDesafio,
   onIrParaIdeias,
+  onEditar,
 }: MeusDesafiosProps) => {
   const [desafios, setDesafios] = useState<Desafio[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -22,7 +26,7 @@ export const MeusDesafios = ({
 
     listarDesafios()
       .then((resultado) => {
-        if (ativo) setDesafios(resultado);
+        if (ativo) setDesafios(resultado.filter((desafio) => desafio.responsavelId === gestorId));
       })
       .catch((error: unknown) => {
         if (ativo) {
@@ -40,7 +44,7 @@ export const MeusDesafios = ({
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [gestorId]);
 
   async function handleExcluir(desafio: Desafio) {
     if (
@@ -173,6 +177,10 @@ export const MeusDesafios = ({
                 )}
 
                 <div className="meus-desafios-page__acoes">
+                  <button type="button" className="meus-desafios-page__btn meus-desafios-page__btn--ver"
+                    disabled={Boolean(excluindoId)} onClick={() => onEditar(desafio)}>
+                    Editar
+                  </button>
                   <button
                     type="button"
                     className="meus-desafios-page__btn meus-desafios-page__btn--ver"
@@ -195,10 +203,6 @@ export const MeusDesafios = ({
         })}
       </section>
 
-      <p className="meus-desafios-page__aviso-api">
-        A API ainda não separa desafios por usuário, então esta lista exibe
-        todos os desafios cadastrados.
-      </p>
     </div>
   );
 };

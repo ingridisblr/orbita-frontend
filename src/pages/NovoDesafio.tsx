@@ -1,9 +1,11 @@
 import { useState, type ChangeEvent, type FormEvent, type FC } from 'react';
-import { cadastrarDesafio } from '../services/desafioService';
+import { atualizarDesafio, cadastrarDesafio } from '../services/desafioService';
+import type { Desafio, StatusDesafio } from '../types/desafio';
 import './NovoDesafio.css';
 
 interface NovoDesafioProps {
   email: string;
+  desafio?: Desafio;
   onVoltar: () => void;
 }
 
@@ -17,19 +19,30 @@ const camposResumo = [
   { campo: 'categoria', rotulo: 'Categoria' },
 ] as const;
 
-export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
+const statusDisponiveis: { id: StatusDesafio; nome: string }[] = [
+  { id: 'aberto', nome: 'Aberto' },
+  { id: 'em_triagem', nome: 'Em triagem' },
+  { id: 'resolvido', nome: 'Resolvido' },
+  { id: 'arquivado', nome: 'Arquivado' },
+];
+
+export const NovoDesafio: FC<NovoDesafioProps> = ({ email, desafio, onVoltar }) => {
   const [sucesso, setSucesso] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [formData, setFormData] = useState({
-    titulo: '',
-    descricao: '',
-    areaResponsavel: '',
-    pessoasAfetadas: '',
-    impacto: '',
-    urgencia: '',
-    categoria: '',
+    titulo: desafio?.titulo ?? '',
+    resumo: desafio?.resumo ?? '',
+    descricao: desafio?.descricao ?? '',
+    areaResponsavel: desafio?.areaDemandante ?? '',
+    pessoasAfetadas: desafio?.quemAfeta ?? '',
+    impacto: desafio?.impacto ?? '',
+    urgencia: desafio?.urgencia ?? '',
+    categoria: desafio?.categoria ?? '',
   });
+  const [status, setStatus] = useState<StatusDesafio | ''>(
+    statusDisponiveis.find((opcao) => opcao.id === desafio?.status)?.id ?? '',
+  );
 
   const resumo = camposResumo.map(({ campo, rotulo }) => ({
     campo,
@@ -57,17 +70,21 @@ export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
     setErro('');
 
     try {
-      await cadastrarDesafio({
-        email: email.trim().toLowerCase(),
+      const dados = {
         titulo: formData.titulo.trim(),
+        resumo: formData.resumo.trim(),
         descricao_problema: formData.descricao.trim(),
         area_demandante: formData.areaResponsavel.trim(),
         quem_afeta: formData.pessoasAfetadas.trim(),
         impacto: formData.impacto,
         urgencia: formData.urgencia,
         categoria: formData.categoria,
-        status: 'aberto',
-      });
+      };
+      if (desafio) {
+        await atualizarDesafio(desafio.id, { ...dados, ...(status && { status }) });
+      } else {
+        await cadastrarDesafio({ ...dados, email: email.trim().toLowerCase(), status: 'aberto' });
+      }
       setSucesso(true);
       window.setTimeout(onVoltar, 1200);
     } catch (error) {
@@ -83,7 +100,7 @@ export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
   return (
     <div className="novo-desafio-page">
       <header className="novo-desafio-page__header">
-        <h1>Novo Desafio</h1>
+        <h1>{desafio ? 'Editar Desafio' : 'Novo Desafio'}</h1>
         <p>Descreva um problema ou necessidade da sua área.</p>
       </header>
 
@@ -92,7 +109,7 @@ export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
           className="novo-desafio-page__estado novo-desafio-page__estado--sucesso"
           role="status"
         >
-          Desafio publicado com sucesso! Redirecionando...
+          {desafio ? 'Desafio atualizado com sucesso.' : 'Desafio publicado com sucesso.'}
         </p>
       )}
       {erro && (
@@ -220,6 +237,19 @@ export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
             </div>
           </div>
 
+          <div className="novo-desafio-page__campo">
+            <label htmlFor="desafio-resumo">Resumo</label>
+            <textarea id="desafio-resumo" name="resumo" value={formData.resumo} maxLength={300} onChange={handleChange} />
+          </div>
+          {desafio && (
+            <div className="novo-desafio-page__campo">
+              <label htmlFor="desafio-status">Status</label>
+              <select id="desafio-status" value={status} onChange={(event) => setStatus(event.target.value as StatusDesafio | '')}>
+                {!status && <option value="">Manter atual</option>}
+                {statusDisponiveis.map((opcao) => <option key={opcao.id} value={opcao.id}>{opcao.nome}</option>)}
+              </select>
+            </div>
+          )}
           <div className="novo-desafio-page__acoes">
             <button
               type="button"
@@ -234,7 +264,7 @@ export const NovoDesafio: FC<NovoDesafioProps> = ({ email, onVoltar }) => {
               className="novo-desafio-page__btn novo-desafio-page__btn--primario"
               disabled={enviando || sucesso}
             >
-              {enviando ? 'Publicando...' : 'Publicar Desafio'}
+              {enviando ? 'Salvando...' : desafio ? 'Salvar alterações' : 'Publicar Desafio'}
             </button>
           </div>
         </form>
