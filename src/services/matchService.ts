@@ -9,7 +9,6 @@ import type {
 } from '../types/match';
 
 const TAMANHO_PAGINA = 100; // máximo aceito pela API
-const LIMITE_PAGINAS = 50; // trava de segurança contra laço infinito
 
 // GET /matches (uma página)
 export async function listarMatches(
@@ -43,10 +42,7 @@ export async function listarTodosMatches(): Promise<Match[]> {
     todos.push(...resposta.items);
     totalPaginas = resposta.pages;
     pagina += 1;
-  } while (
-    pagina <= totalPaginas &&
-    pagina <= LIMITE_PAGINAS
-  );
+  } while (pagina <= totalPaginas);
 
   return todos;
 }
@@ -71,4 +67,11 @@ export async function criarMatch(
 
 export async function listarDesafiosParaMatch(): Promise<Desafio[]> {
   return listarDesafios();
+}
+
+export function sugerirMatchesPorRegra(idDesafio: number): Promise<{ sugestoes: Match[] }> {
+  return apiRequest('/matches/sugerir-regra', {
+    method: 'POST',
+    body: JSON.stringify({ id_desafio: idDesafio }),
+  });
 }

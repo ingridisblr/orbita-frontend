@@ -8,6 +8,7 @@ export interface RespostaPaginada<T> {
 export interface DesafioApi {
   id_desafio: number | string;
   titulo: string;
+  resumo?: string | null;
   descricao_problema: string;
   area_demandante: string;
   quem_afeta: string;
@@ -22,7 +23,9 @@ export interface DesafioApi {
 
 export interface Desafio {
   id: string;
+  responsavelId: string;
   titulo: string;
+  resumo?: string;
   descricao: string;
   areaDemandante: string;
   quemAfeta: string;
@@ -33,16 +36,19 @@ export interface Desafio {
   dataCriacao: string;
 }
 
+export type StatusDesafio = 'aberto' | 'em_triagem' | 'resolvido' | 'arquivado';
+
 export interface NovoDesafioPayload {
   email: string;
   titulo: string;
+  resumo?: string;
   descricao_problema: string;
   area_demandante: string;
   quem_afeta: string;
   impacto: string;
   urgencia: string;
   categoria: string;
-  status: 'aberto' | 'ativo';
+  status: StatusDesafio;
 }
 
 export function converterDesafio(dado: DesafioApi): Desafio {
@@ -54,7 +60,9 @@ export function converterDesafio(dado: DesafioApi): Desafio {
 
   return {
     id: String(dado.id_desafio),
+    responsavelId: String(dado.id_responsavel ?? ''),
     titulo: dado.titulo ?? '',
+    resumo: dado.resumo ?? '',
     descricao: dado.descricao_problema ?? '',
     areaDemandante: dado.area_demandante ?? '',
     quemAfeta: dado.quem_afeta ?? '',

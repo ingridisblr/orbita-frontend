@@ -4,6 +4,8 @@ export type StatusIdeia =
   | 'Nova'
   | 'Em Match'
   | 'Em Triagem'
+  | 'Aceita'
+  | 'Rejeitada'
   | 'Aprovada'
   | 'Em Desenvolvimento'
   | 'Arquivada'
@@ -19,15 +21,20 @@ export interface Ideia {
   areaOrigem: string;
   categoria: string;
   beneficioEsperado: string;
+  problemaResolvido?: string;
   status: StatusIdeia;
   data: string;
   usuarioId: string;
 }
 
 export interface CriarIdeiaPayload {
-  id_desafio: number | string;
+  id_desafio?: number | null;
   titulo: string;
   descricao: string;
+  area?: string;
+  categoria?: string;
+  beneficio_esperado?: string;
+  problema_resolvido?: string;
 }
 
 export interface IdeiaApi {
@@ -41,6 +48,7 @@ export interface IdeiaApi {
   id_desafio?: number | string;
   desafio_id?: number | string;
   titulo_desafio?: string;
+  desafio_titulo?: string | null;
   desafio?:
     | string
     | {
@@ -98,16 +106,16 @@ export function converterIdeia(dado: IdeiaApi): Ideia {
       dado.id_desafio ?? dado.desafio_id ?? desafioAninhado?.id_desafio
     ),
     desafio: toText(
-      dado.titulo_desafio ??
+      dado.desafio_titulo ??
+        dado.titulo_desafio ??
         (typeof dado.desafio === 'string' ? dado.desafio : undefined) ??
         desafioAninhado?.titulo ??
         desafioAninhado?.titulo_desafio
     ),
     areaOrigem: toText(dado.area_origem ?? dado.area),
     categoria: toText(dado.categoria),
-    beneficioEsperado: toText(
-      dado.beneficio_esperado ?? dado.problema_resolvido
-    ),
+    beneficioEsperado: toText(dado.beneficio_esperado),
+    problemaResolvido: toText(dado.problema_resolvido),
     status: toText(dado.status).replace(/^./, (letra) => letra.toUpperCase()),
     data: formatDate(dado.data_criacao ?? dado.created_at),
     usuarioId: toId(

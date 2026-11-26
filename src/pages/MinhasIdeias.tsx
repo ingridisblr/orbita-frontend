@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { consultarIdeia, listarIdeias } from '../services/ideiaService';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { arquivarIdeia, atualizarIdeia, consultarIdeia, listarTodasIdeias } from '../services/ideiaService';
 import type { Ideia } from '../types/ideia';
 import './MinhasIdeias.css';
 
@@ -26,16 +26,16 @@ export function MinhasIdeias() {
   const [detalhes, setDetalhes] = useState<Ideia | null>(null);
   const [carregandoDetalhes, setCarregandoDetalhes] = useState(false);
   const [erroDetalhes, setErroDetalhes] = useState('');
+  const [rascunho, setRascunho] = useState<Pick<Ideia, 'titulo' | 'descricao' | 'areaOrigem' | 'categoria' | 'beneficioEsperado' | 'problemaResolvido'> | null>(null);
+  const [salvando, setSalvando] = useState(false);
+  const [mensagem, setMensagem] = useState('');
   const modalRef = useRef<HTMLDialogElement>(null);
   const idSelecionado = ideiaSelecionada?.id;
   const modalAberto = ideiaSelecionada !== null;
 
   useEffect(() => {
     let ativo = true;
-    setCarregando(true);
-    setErro('');
-
-    listarIdeias({ minhas: true })
+    listarTodasIdeias({ minhas: true })
       .then((resultado) => {
         if (ativo) setIdeias(resultado);
       })
@@ -96,11 +96,14 @@ export function MinhasIdeias() {
   function abrirDetalhes(ideia: Ideia) {
     setDetalhes(null);
     setErroDetalhes('');
+    setMensagem('');
     setCarregandoDetalhes(Boolean(ideia.id));
     setIdeiaSelecionada(ideia);
   }
 
   function fecharDetalhes() {
+    if (salvando) return;
+    setRascunho(null);
     setIdeiaSelecionada(null);
     setDetalhes(null);
     setCarregandoDetalhes(false);
@@ -116,6 +119,41 @@ export function MinhasIdeias() {
     (obterCampo('desafioId') ? `Desafio #${obterCampo('desafioId')}` : '');
 
   const statusPreview = obterCampo('status');
+  const podeEditar = ['submetida', 'nova', 'rascunho'].includes(statusPreview.trim().toLowerCase());
+
+  async function salvar(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    if (!idSelecionado || !podeEditar || salvando || carregandoDetalhes) return;
+    if (!event && !window.confirm(`Arquivar a ideia “${obterCampo('titulo')}”?`)) return;
+    if (event && (!rascunho || rascunho.titulo.trim().length < 3 || rascunho.descricao.trim().length < 10)) {
+      setErroDetalhes('Use pelo menos 3 caracteres no título e 10 na descrição.');
+      return;
+    }
+    setSalvando(true);
+    setErroDetalhes('');
+    setMensagem('');
+    try {
+      const atualizada = event && rascunho
+        ? await atualizarIdeia(idSelecionado, {
+            titulo: rascunho.titulo.trim(),
+            descricao: rascunho.descricao.trim(),
+            area: rascunho.areaOrigem,
+            categoria: rascunho.categoria,
+            beneficio_esperado: rascunho.beneficioEsperado,
+            problema_resolvido: rascunho.problemaResolvido,
+          })
+        : await arquivarIdeia(idSelecionado);
+      setDetalhes(atualizada);
+      setIdeiaSelecionada(atualizada);
+      setIdeias((atuais) => atuais.map((item) => item.id === atualizada.id ? atualizada : item));
+      setRascunho(null);
+      setMensagem(event ? 'Ideia atualizada.' : 'Ideia arquivada.');
+    } catch (error) {
+      setErroDetalhes(error instanceof Error ? error.message : 'Não foi possível alterar a ideia.');
+    } finally {
+      setSalvando(false);
+    }
+  }
 
   return (
     <div className="minhas-ideias-page" aria-busy={carregando}>
@@ -303,20 +341,52 @@ export function MinhasIdeias() {
                 <dd>{obterCampo('descricao') || 'Não informada'}</dd>
               </div>
               <div className="minhas-ideias-page__modal-campo-largo">
+                <dt>Problema que a ideia resolve</dt>
+                <dd>{obterCampo('problemaResolvido') || 'Não informado'}</dd>
+              </div>
+              <div className="minhas-ideias-page__modal-campo-largo">
                 <dt>Benefício esperado</dt>
                 <dd>{obterCampo('beneficioEsperado') || 'Não informado'}</dd>
               </div>
             </dl>
 
             <footer className="minhas-ideias-page__modal-acoes">
+              {podeEditar && !rascunho && (
+                <>
+                  <button type="button" className="minhas-ideias-page__btn" disabled={salvando || carregandoDetalhes}
+                    onClick={() => setRascunho(detalhes ?? ideiaSelecionada)}>
+                    Editar
+                  </button>
+                  <button type="button" className="minhas-ideias-page__btn" disabled={salvando || carregandoDetalhes}
+                    onClick={() => void salvar()}>
+                    Arquivar
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 className="minhas-ideias-page__btn"
                 onClick={fecharDetalhes}
+                disabled={salvando}
               >
                 Fechar
               </button>
             </footer>
+            {mensagem && <p role="status">{mensagem}</p>}
+            {rascunho && (
+              <form onSubmit={salvar} className="minhas-ideias-page__form">
+                <fieldset disabled={salvando}>
+                  <label>Título<input value={rascunho.titulo} required minLength={3} maxLength={150} onChange={(event) => setRascunho({ ...rascunho, titulo: event.target.value })} /></label>
+                  <label>Descrição<textarea value={rascunho.descricao} required minLength={10} maxLength={5000} onChange={(event) => setRascunho({ ...rascunho, descricao: event.target.value })} /></label>
+                  <label>Área<input value={rascunho.areaOrigem} maxLength={100} onChange={(event) => setRascunho({ ...rascunho, areaOrigem: event.target.value })} /></label>
+                  <label>Categoria<input value={rascunho.categoria} maxLength={100} onChange={(event) => setRascunho({ ...rascunho, categoria: event.target.value })} /></label>
+                  <label>Problema que a ideia resolve<textarea value={rascunho.problemaResolvido ?? ''} maxLength={5000} onChange={(event) => setRascunho({ ...rascunho, problemaResolvido: event.target.value })} /></label>
+                  <label>Benefício esperado<textarea value={rascunho.beneficioEsperado} maxLength={5000} onChange={(event) => setRascunho({ ...rascunho, beneficioEsperado: event.target.value })} /></label>
+                  <button type="submit" className="minhas-ideias-page__btn">{salvando ? 'Salvando...' : 'Salvar alterações'}</button>
+                  <button type="button" className="minhas-ideias-page__btn" onClick={() => setRascunho(null)}>Cancelar edição</button>
+                </fieldset>
+              </form>
+            )}
           </div>
         )}
       </dialog>

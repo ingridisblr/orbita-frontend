@@ -367,6 +367,28 @@
   border-top: 1px solid var(--mi-borda);
 }
 
+.minhas-ideias-page__form fieldset {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-top: 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.minhas-ideias-page__form label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.minhas-ideias-page__form :is(input, textarea) {
+  width: 100%;
+  padding: 0.55rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 8px;
+  font: inherit;
+}
+
 .minhas-ideias-page__btn {
   min-height: 2.6rem;
   padding: 0.55rem 1rem;

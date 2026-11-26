@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import type { ProjetoDetalhadoApi } from '../services/projetoService';
+import { formatarData } from '../utils/matchFormatters';
 import './ProjetosKanban.css';
 
 const colunas = [
@@ -15,38 +17,47 @@ export interface ProjetoKanban {
   id: string;
   codigo: string;
   titulo: string;
-  area?: string;
+  responsavel?: string;
   status: StatusProjetoKanban;
 }
 
 export interface NovoProjetoKanban {
   titulo: string;
-  area: string;
-  status: StatusProjetoKanban;
+  matchId: string;
+  prazo: string;
 }
 
 export interface ProjetosKanbanProps {
   projetos?: readonly ProjetoKanban[];
   carregando?: boolean;
   erro?: string;
+  origens?: readonly { id: number; titulo: string }[];
+  avisoOrigens?: string;
   onCriarProjeto?: (projeto: NovoProjetoKanban) => Promise<void> | void;
   onMoverProjeto?: (id: string, status: StatusProjetoKanban) => Promise<void> | void;
+  onConsultarProjeto: (id: string) => Promise<ProjetoDetalhadoApi>;
+  onAtualizarProjeto: (id: string, dados: { titulo: string; descricao: string | null; data_prazo: string | null }) => Promise<ProjetoDetalhadoApi>;
 }
 
 export function ProjetosKanban({
   projetos,
   carregando = false,
   erro = '',
+  origens = [],
+  avisoOrigens,
   onCriarProjeto,
   onMoverProjeto,
+  onConsultarProjeto,
+  onAtualizarProjeto,
 }: ProjetosKanbanProps) {
   const [formulario, setFormulario] = useState<NovoProjetoKanban | null>(null);
   const [processando, setProcessando] = useState(false);
   const [mensagem, setMensagem] = useState('');
   const [erroAcao, setErroAcao] = useState('');
+  const [editando, setEditando] = useState<ProjetoDetalhadoApi | null>(null);
   const bloqueado = carregando || Boolean(erro) || processando;
   const modalRef = useRef<HTMLDialogElement>(null);
-  const formularioAberto = formulario !== null;
+  const formularioAberto = formulario !== null || editando !== null;
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -61,8 +72,8 @@ export function ProjetosKanban({
     };
   }, [formularioAberto]);
 
-  function abrirFormulario(status: StatusProjetoKanban = 'aprovado') {
-    setFormulario({ titulo: '', area: '', status });
+  function abrirFormulario() {
+    setFormulario({ titulo: '', matchId: '', prazo: '' });
     setMensagem('');
     setErroAcao('');
   }
@@ -70,7 +81,46 @@ export function ProjetosKanban({
   function fecharFormulario() {
     if (processando) return;
     setFormulario(null);
+    setEditando(null);
     setErroAcao('');
+  }
+
+  async function consultar(projeto: ProjetoKanban) {
+    if (bloqueado) return;
+    setProcessando(true);
+    setErroAcao('');
+    setMensagem('');
+    try {
+      setEditando(await onConsultarProjeto(projeto.id));
+    } catch (error) {
+      setErroAcao(error instanceof Error ? error.message : 'Não foi possível consultar o projeto.');
+    } finally {
+      setProcessando(false);
+    }
+  }
+
+  async function atualizar(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editando || bloqueado) return;
+    const titulo = editando.titulo.trim();
+    if (titulo.length < 3) {
+      setErroAcao('Informe um título com pelo menos 3 caracteres.');
+      return;
+    }
+    setProcessando(true);
+    setErroAcao('');
+    try {
+      setEditando(await onAtualizarProjeto(String(editando.id_projeto), {
+        titulo,
+        descricao: editando.descricao?.trim() || null,
+        data_prazo: editando.data_prazo || null,
+      }));
+      setMensagem('Projeto atualizado.');
+    } catch (error) {
+      setErroAcao(error instanceof Error ? error.message : 'Não foi possível atualizar o projeto.');
+    } finally {
+      setProcessando(false);
+    }
   }
 
   async function criarProjeto(event: FormEvent<HTMLFormElement>) {
@@ -80,8 +130,8 @@ export function ProjetosKanban({
 
     const titulo = formulario.titulo.trim();
 
-    if (!titulo) {
-      setErroAcao('Informe o título do projeto.');
+    if (!formulario.matchId || (titulo && titulo.length < 3)) {
+      setErroAcao('Selecione o vínculo e, se informar um título, use pelo menos 3 caracteres.');
       return;
     }
 
@@ -93,7 +143,6 @@ export function ProjetosKanban({
       await onCriarProjeto({
         ...formulario,
         titulo,
-        area: formulario.area.trim(),
       });
       setFormulario(null);
       setMensagem('Projeto cadastrado com sucesso.');
@@ -133,7 +182,7 @@ export function ProjetosKanban({
           type="button"
           className="kanban-page__btn kanban-page__btn--primario"
           onClick={() => abrirFormulario()}
-          disabled={bloqueado}
+          disabled={bloqueado || !origens.length}
         >
           <span aria-hidden="true">+</span> Novo Projeto
         </button>
@@ -141,6 +190,9 @@ export function ProjetosKanban({
 
       {carregando && <p className="kanban-page__estado" role="status">Carregando projetos...</p>}
       {erro && <p className="kanban-page__estado kanban-page__erro" role="alert">{erro}</p>}
+      {!carregando && !erro && !origens.length && (
+        <p className="kanban-page__estado">{avisoOrigens || 'Para criar um projeto, é preciso ter um match validado, uma triagem aprovada e uma ideia aprovada.'}</p>
+      )}
       {!carregando && !erro && projetos === undefined && (
         <p className="kanban-page__estado">Dados dos projetos indisponíveis.</p>
       )}
@@ -151,12 +203,52 @@ export function ProjetosKanban({
         ref={modalRef}
         className="kanban-page__modal"
         aria-labelledby="kanban-form-title"
-        aria-describedby="kanban-form-description"
+        aria-describedby={formulario ? 'kanban-form-description' : undefined}
         onCancel={(event) => {
           event.preventDefault();
           fecharFormulario();
         }}
       >
+        {editando && (
+          <section className="kanban-page__form-card">
+            <h2 id="kanban-form-title">Detalhes do projeto</h2>
+            {erroAcao && <p className="kanban-page__erro" role="alert">{erroAcao}</p>}
+            {mensagem && <p className="kanban-page__sucesso" role="status">{mensagem}</p>}
+            <form onSubmit={atualizar}>
+              <fieldset className="kanban-page__form-fields" disabled={processando}>
+                <label>
+                  Título
+                  <input required minLength={3} maxLength={150} value={editando.titulo}
+                    onChange={(event) => setEditando({ ...editando, titulo: event.target.value })} />
+                </label>
+                <label>
+                  Descrição
+                  <textarea maxLength={5000} value={editando.descricao ?? ''}
+                    onChange={(event) => setEditando({ ...editando, descricao: event.target.value })} />
+                </label>
+                <label>
+                  Prazo
+                  <input type="date" value={editando.data_prazo ?? ''}
+                    onChange={(event) => setEditando({ ...editando, data_prazo: event.target.value })} />
+                </label>
+              </fieldset>
+              <h3>Histórico de movimentações</h3>
+              {editando.historico.length ? (
+                <ul>
+                  {editando.historico.map((item) => (
+                    <li key={item.id_movimentacao}>{item.etapa_origem} → {item.etapa_destino} · {formatarData(item.data_movimentacao)}</li>
+                  ))}
+                </ul>
+              ) : <p>Nenhuma movimentação registrada.</p>}
+              <div className="kanban-page__form-actions">
+                <button type="button" className="kanban-page__btn" disabled={processando} onClick={fecharFormulario}>Fechar</button>
+                <button type="submit" className="kanban-page__btn kanban-page__btn--primario" disabled={processando}>
+                  {processando ? 'Salvando...' : 'Salvar alterações'}
+                </button>
+              </div>
+            </form>
+          </section>
+        )}
         {formulario && (
           <section className="kanban-page__form-card">
             <header className="kanban-page__modal-header">
@@ -185,9 +277,9 @@ export function ProjetosKanban({
             <form onSubmit={criarProjeto}>
               <div className="kanban-page__form-fields">
                 <label className="kanban-page__campo-titulo">
-                  Título do projeto *
+                  Título do projeto
                   <input
-                    required
+                    maxLength={150}
                     autoFocus
                     value={formulario.titulo}
                     onChange={(event) => setFormulario({ ...formulario, titulo: event.target.value })}
@@ -196,23 +288,21 @@ export function ProjetosKanban({
                   />
                 </label>
                 <label>
-                  Área responsável
-                  <input
-                    value={formulario.area}
-                    onChange={(event) => setFormulario({ ...formulario, area: event.target.value })}
-                    disabled={bloqueado}
-                    placeholder="Informe a área"
-                  />
+                  Ideia e desafio *
+                  <select required value={formulario.matchId} disabled={bloqueado}
+                    onChange={(event) => setFormulario({ ...formulario, matchId: event.target.value })}>
+                    <option value="">Selecione um vínculo</option>
+                    {origens.map((item) => <option key={item.id} value={item.id}>{item.titulo}</option>)}
+                  </select>
                 </label>
                 <label>
-                  Etapa inicial
-                  <select
-                    value={formulario.status}
-                    onChange={(event) => setFormulario({ ...formulario, status: event.target.value as StatusProjetoKanban })}
+                  Prazo
+                  <input
+                    type="date"
+                    value={formulario.prazo}
+                    onChange={(event) => setFormulario({ ...formulario, prazo: event.target.value })}
                     disabled={bloqueado}
-                  >
-                    {colunas.map((coluna) => <option key={coluna.id} value={coluna.id}>{coluna.titulo}</option>)}
-                  </select>
+                  />
                 </label>
               </div>
               <div className="kanban-page__form-actions">
@@ -248,8 +338,11 @@ export function ProjetosKanban({
                   <li key={projeto.id} className="kanban-page__projeto">
                     <span className="kanban-page__codigo">{projeto.codigo}</span>
                     <h3>{projeto.titulo}</h3>
-                    {projeto.area && <p>{projeto.area}</p>}
-                    {onMoverProjeto && (
+                    {projeto.responsavel && <p>{projeto.responsavel}</p>}
+                    <button type="button" className="kanban-page__btn" disabled={bloqueado} onClick={() => void consultar(projeto)}>
+                      Ver detalhes
+                    </button>
+                    {onMoverProjeto && projeto.status !== 'concluido' && (
                       <label className="kanban-page__mover">
                         <span>Mover para</span>
                         <select
@@ -267,15 +360,15 @@ export function ProjetosKanban({
                 {!lista.length && <li className="kanban-page__vazio">{carregando ? 'Carregando...' : projetos ? 'Nenhum projeto' : 'Sem dados'}</li>}
               </ul>
 
-              <button
+              {coluna.id === 'aprovado' && <button
                 type="button"
                 className="kanban-page__adicionar"
                 aria-label={`Adicionar projeto em ${coluna.titulo}`}
-                onClick={() => abrirFormulario(coluna.id)}
-                disabled={bloqueado}
+                onClick={abrirFormulario}
+                disabled={bloqueado || !origens.length}
               >
                 <span aria-hidden="true">+</span> Adicionar
-              </button>
+              </button>}
             </section>
           );
         })}

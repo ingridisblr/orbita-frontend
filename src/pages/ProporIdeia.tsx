@@ -4,10 +4,12 @@ import type { Desafio } from '../types/desafio';
 import { listarDesafios } from '../services/desafioService';
 import './ProporIdeia.css';
 
+export type PropostaIdeia = Omit<Ideia, 'id' | 'codigo' | 'status' | 'data' | 'usuarioId'> & {
+  problemaResolvido: string;
+};
+
 interface ProporIdeiaProps {
-  onSubmit: (
-    ideia: Omit<Ideia, 'id' | 'codigo' | 'status' | 'data' | 'usuarioId'>,
-  ) => Promise<void> | void;
+  onSubmit: (ideia: PropostaIdeia) => Promise<void> | void;
   desafioIdInicial?: string;
   onVoltar?: () => void;
 }
@@ -19,6 +21,7 @@ interface IdeiaFormState {
   areaOrigem: string;
   categoria: string;
   beneficioEsperado: string;
+  problemaResolvido: string;
 }
 
 const formInicial: IdeiaFormState = {
@@ -28,6 +31,7 @@ const formInicial: IdeiaFormState = {
   areaOrigem: '',
   categoria: '',
   beneficioEsperado: '',
+  problemaResolvido: '',
 };
 
 export function ProporIdeia({
@@ -59,7 +63,7 @@ export function ProporIdeia({
             desafioIdInicial &&
             ativos.some((item) => item.id === desafioIdInicial)
               ? desafioIdInicial
-              : atual.desafioId,
+              : '',
         }));
       })
       .catch((error: unknown) => {
@@ -89,7 +93,7 @@ export function ProporIdeia({
       valor: desafioSelecionado
         ? `DSF-${desafioSelecionado.id} · ${desafioSelecionado.titulo}`
         : '',
-      obrigatorio: true,
+      obrigatorio: false,
     },
     {
       campo: 'titulo',
@@ -121,6 +125,12 @@ export function ProporIdeia({
       valor: formData.beneficioEsperado,
       obrigatorio: false,
     },
+    {
+      campo: 'problemaResolvido',
+      rotulo: 'Problema que a ideia resolve',
+      valor: formData.problemaResolvido,
+      obrigatorio: false,
+    },
   ].map((item) => ({ ...item, preenchido: Boolean(item.valor.trim()) }));
 
   const preenchidos = resumo.filter((item) => item.preenchido).length;
@@ -140,12 +150,12 @@ export function ProporIdeia({
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (
-      !desafioSelecionado ||
-      !formData.titulo.trim() ||
-      !formData.resumo.trim()
+      (formData.desafioId && !desafioSelecionado) ||
+      formData.titulo.trim().length < 3 ||
+      formData.resumo.trim().length < 10
     ) {
       setErroDesafios(
-        'Selecione um desafio aberto e preencha o título e a descrição da ideia.',
+        'Informe um título com pelo menos 3 caracteres e uma descrição com pelo menos 10. Se vincular um desafio, selecione um desafio aberto.',
       );
       return;
     }
@@ -156,11 +166,12 @@ export function ProporIdeia({
       await onSubmit({
         titulo: formData.titulo.trim(),
         descricao: formData.resumo.trim(),
-        desafioId: desafioSelecionado.id,
-        desafio: desafioSelecionado.titulo,
+        desafioId: desafioSelecionado?.id ?? '',
+        desafio: desafioSelecionado?.titulo ?? '',
         areaOrigem: formData.areaOrigem,
         categoria: formData.categoria,
         beneficioEsperado: formData.beneficioEsperado.trim(),
+        problemaResolvido: formData.problemaResolvido.trim(),
       });
       setFormData({ ...formInicial });
     } catch (error) {
@@ -190,7 +201,7 @@ export function ProporIdeia({
     <div className="propor-ideia-page">
       <header className="propor-ideia-page__header">
         <h1>Propor Nova Ideia</h1>
-        <p>Descreva sua proposta de solução para um desafio aberto</p>
+        <p>Descreva sua proposta de solução. Se houver um desafio aberto relacionado, vincule-o à ideia.</p>
       </header>
 
       <div className="propor-ideia-page__layout">
@@ -208,19 +219,18 @@ export function ProporIdeia({
             </p>
           )}
           <div className="propor-ideia-page__campo">
-            <label htmlFor="desafioId">Desafio relacionado *</label>
+            <label htmlFor="desafioId">Desafio relacionado</label>
             <select
               id="desafioId"
               name="desafioId"
               value={formData.desafioId}
               onChange={handleChange}
-              required
               disabled={carregandoDesafios}
             >
               <option value="">
                 {carregandoDesafios
                   ? 'Carregando desafios...'
-                  : 'Selecionar...'}
+                  : 'Sem desafio vinculado'}
               </option>
               {desafios.map((desafio) => (
                 <option key={desafio.id} value={desafio.id}>
@@ -240,6 +250,8 @@ export function ProporIdeia({
               value={formData.titulo}
               onChange={handleChange}
               required
+              minLength={3}
+              maxLength={150}
             />
           </div>
 
@@ -262,7 +274,15 @@ export function ProporIdeia({
               value={formData.resumo}
               onChange={handleChange}
               required
+              minLength={10}
+              maxLength={5000}
             />
+          </div>
+
+          <div className="propor-ideia-page__campo">
+            <label htmlFor="problemaResolvido">Problema que a ideia resolve</label>
+            <textarea id="problemaResolvido" name="problemaResolvido" rows={3}
+              maxLength={5000} value={formData.problemaResolvido} onChange={handleChange} />
           </div>
 
           <div className="propor-ideia-page__linha">
@@ -315,6 +335,7 @@ export function ProporIdeia({
               rows={2}
               placeholder="Que resultados esta ideia pode gerar?"
               value={formData.beneficioEsperado}
+              maxLength={5000}
               onChange={handleChange}
             />
           </div>
@@ -331,7 +352,7 @@ export function ProporIdeia({
             <button
               type="submit"
               className="propor-ideia-page__btn propor-ideia-page__btn--primario"
-              disabled={enviando || carregandoDesafios || desafios.length === 0}
+              disabled={enviando || carregandoDesafios}
             >
               {enviando ? 'Submetendo...' : 'Submeter Ideia'}
             </button>

@@ -1,19 +1,19 @@
 import './PainelAvaliacao.css';
 
 export interface IndicadoresAvaliacao {
-  matchPendente: number;
-  triagemPendente: number;
-  projetosAtivos: number;
-  mvpsEmValidacao: number;
+  matchPendente?: number;
+  triagemPendente?: number;
+  projetosAtivos?: number;
+  mvpsEmValidacao?: number;
 }
 
 export interface FluxoAvaliacao {
-  desafiosCadastrados: number;
-  comIdeiasVinculadas: number;
-  aposMatchConfirmado: number;
-  emTriagem: number;
-  aprovadosParaProjeto: number;
-  concluidos: number;
+  desafiosCadastrados?: number;
+  comIdeiasVinculadas?: number;
+  aposMatchConfirmado?: number;
+  emTriagem?: number;
+  aprovadosParaProjeto?: number;
+  concluidos?: number;
 }
 
 export interface AtividadeAvaliacao {
@@ -30,6 +30,7 @@ export interface PainelAvaliacaoProps {
   atividades?: readonly AtividadeAvaliacao[];
   carregando?: boolean;
   erro?: string;
+  aviso?: string;
 }
 
 export function PainelAvaliacao({
@@ -38,6 +39,7 @@ export function PainelAvaliacao({
   atividades,
   carregando = false,
   erro = '',
+  aviso = '',
 }: PainelAvaliacaoProps) {
   const cards = [
     {
@@ -74,6 +76,7 @@ export function PainelAvaliacao({
         { titulo: 'Aprovados para projeto', valor: fluxo.aprovadosParaProjeto },
         { titulo: 'Concluídos', valor: fluxo.concluidos },
       ]
+      .filter((etapa): etapa is { titulo: string; valor: number } => etapa.valor !== undefined)
     : [];
 
   const maiorValor = Math.max(1, ...etapas.map(({ valor }) => valor));
@@ -96,6 +99,9 @@ export function PainelAvaliacao({
         <p className="painel-avaliacao__estado painel-avaliacao__estado--erro" role="alert">
           {erro}
         </p>
+      )}
+      {aviso && (
+        <p className="painel-avaliacao__estado painel-avaliacao__estado--erro" role="alert">{aviso}</p>
       )}
 
       {exibirDados && (

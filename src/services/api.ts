@@ -114,7 +114,7 @@ async function executar<T>(
     let erro: ApiError;
 
     try {
-      const resposta = await fetch(`${API_URL}${endpoint}`, {
+      const resposta = await fetch(`${API_URL.replace(/\/+$/, '')}${endpoint}`, {
         ...options,
         headers,
       });

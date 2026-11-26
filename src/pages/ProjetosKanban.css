@@ -207,6 +207,13 @@
   gap: 0.8rem;
 }
 
+fieldset.kanban-page__form-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 .kanban-page__form-fields label,
 .kanban-page__mover {
   display: grid;
@@ -216,7 +223,7 @@
   font-weight: 600;
 }
 
-.kanban-page :is(input, select) {
+.kanban-page :is(input, select, textarea) {
   min-width: 0;
   width: 100%;
   min-height: 2.5rem;

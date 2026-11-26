@@ -52,6 +52,10 @@ function extrairLista(resposta: unknown): IdeiaApi[] {
 export async function listarIdeias(
   opcoes: ListarIdeiasOpcoes = {}
 ): Promise<Ideia[]> {
+  return (await consultarPaginaIdeias(opcoes)).ideias;
+}
+
+async function consultarPaginaIdeias(opcoes: ListarIdeiasOpcoes) {
   const parametros = new URLSearchParams({
     page: String(opcoes.page ?? 1),
     page_size: String(opcoes.pageSize ?? 100),
@@ -62,14 +66,18 @@ export async function listarIdeias(
   }
 
   if (opcoes.desafioId) {
-    parametros.set('desafio', opcoes.desafioId);
+    parametros.set('id_desafio', opcoes.desafioId);
   }
 
   const resposta = await apiRequest<unknown>(
     `/ideias?${parametros.toString()}`
   );
 
-  return extrairLista(resposta).map(converterIdeia);
+  const paginas = (resposta as { pages?: unknown } | null)?.pages;
+  return {
+    ideias: extrairLista(resposta).map(converterIdeia),
+    paginas: typeof paginas === 'number' ? paginas : 1,
+  };
 }
 
 export async function cadastrarIdeia(
@@ -105,11 +113,24 @@ export async function atualizarIdeia(
   return converterIdeia(resposta);
 }
 
-export async function arquivarIdeia(id: string): Promise<void> {
-  await apiRequest<unknown>(
+export async function arquivarIdeia(id: string): Promise<Ideia> {
+  const resposta = await apiRequest<IdeiaApi>(
     `/ideias/${encodeURIComponent(id)}/arquivar`,
     { method: 'POST' }
   );
+  return converterIdeia(resposta);
+}
+
+export async function aceitarIdeia(id: string): Promise<void> {
+  await apiRequest<unknown>(`/ideias/${encodeURIComponent(id)}/aceitar`, {
+    method: 'POST',
+  });
+}
+
+export async function rejeitarIdeia(id: string): Promise<void> {
+  await apiRequest<unknown>(`/ideias/${encodeURIComponent(id)}/rejeitar`, {
+    method: 'POST',
+  });
 }
 
 export async function arquivarIdeiaComDelete(
@@ -132,27 +153,17 @@ export async function aprovarIdeia(id: string): Promise<Ideia> {
 
 // Todas as ideias visíveis ao usuário (o Analista/Hub vê todas),
 // percorrendo as páginas de até 100 itens
-export async function listarTodasIdeias(): Promise<Ideia[]> {
+export async function listarTodasIdeias(
+  filtros: Pick<ListarIdeiasOpcoes, 'minhas' | 'desafioId'> = {},
+): Promise<Ideia[]> {
   const todas: Ideia[] = [];
-  let pagina = 1;
   let totalPaginas = 1;
 
-  do {
-    const parametros = new URLSearchParams({
-      page:      String(pagina),
-      page_size: '100',
-    });
-
-    const resposta = await apiRequest<unknown>(
-      `/ideias?${parametros.toString()}`
-    );
-
-    todas.push(...extrairLista(resposta).map(converterIdeia));
-
-    const paginas = (resposta as { pages?: unknown } | null)?.pages;
-    totalPaginas = typeof paginas === 'number' ? paginas : 1;
-    pagina += 1;
-  } while (pagina <= totalPaginas && pagina <= 50);
+  for (let page = 1; page <= totalPaginas; page++) {
+    const { ideias, paginas } = await consultarPaginaIdeias({ ...filtros, page });
+    todas.push(...ideias);
+    totalPaginas = paginas;
+  }
 
   return todas;
 }

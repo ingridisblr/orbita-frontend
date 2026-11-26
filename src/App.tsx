@@ -10,7 +10,7 @@ import { getCurrentUser, logout } from './services/authService';
 
 // Páginas do Colaborador
 import { DesafiosAbertos } from './pages/DesafiosAbertos';
-import { ProporIdeia } from './pages/ProporIdeia';
+import { ProporIdeia, type PropostaIdeia } from './pages/ProporIdeia';
 import { MinhasIdeias } from './pages/MinhasIdeias';
 
 // Páginas do Gestor
@@ -21,9 +21,9 @@ import { IdeiasRelacionadas } from './pages/IdeiasRelacionadas';
 // Páginas do Analista
 import CadastrarUsuario from './pages/CadastrarUsuario';
 import { Match } from './pages/Match';
-import { PainelAvaliacao } from './pages/PainelAvaliacao';
-import { Triagem } from './pages/Triagem';
-import { ProjetosKanban } from './pages/ProjetosKanban';
+import { PainelAvaliacaoIntegrado } from './pages/PainelAvaliacaoIntegrado';
+import { TriagemIntegrada } from './pages/TriagemIntegrada';
+import { KanbanIntegrado } from './pages/KanbanIntegrado';
 import { MVP } from './pages/MVP';
 import { Dashboard } from './pages/Dashboard';
 import { Resultados } from './pages/Resultados';
@@ -31,7 +31,7 @@ import { Auditoria } from './pages/Auditoria';
 
 // Tipos
 import type { User, UserRole } from './types/auth';
-import type { Ideia } from './types/ideia';
+import type { Desafio } from './types/desafio';
 import { cadastrarIdeia } from './services/ideiaService';
 
 // Página inicial de cada perfil
@@ -106,6 +106,7 @@ export default function App() {
   );
 
   const [desafioSelecionadoId, setDesafioSelecionadoId] = useState('');
+  const [desafioEmEdicao, setDesafioEmEdicao] = useState<Desafio>();
 
   // Login realizado com sucesso
   function handleLoginSuccess(usuario: User) {
@@ -133,23 +134,28 @@ export default function App() {
     const paginasPermitidas = paginasPorPerfil[user.role];
 
     if (paginasPermitidas.includes(item)) {
+      if (item === 'novo-desafio') setDesafioEmEdicao(undefined);
+      if (item === 'ideias-relacionadas' || item === 'propor-ideia') setDesafioSelecionadoId('');
       setActiveItem(item);
     }
   }
 
   // Cadastrar a ideia no backend com o token do usuário autenticado
   async function handleSubmitIdea(
-    novaIdeia: Omit<Ideia, 'id' | 'codigo' | 'status' | 'data' | 'usuarioId'>
+    novaIdeia: PropostaIdeia
   ) {
     if (!user || user.role !== 'colaborador') {
       throw new Error('Apenas colaboradores podem cadastrar ideias.');
     }
 
-    const idDesafio = Number(novaIdeia.desafioId);
     await cadastrarIdeia({
-      id_desafio: Number.isNaN(idDesafio) ? novaIdeia.desafioId : idDesafio,
+      id_desafio: novaIdeia.desafioId ? Number(novaIdeia.desafioId) : null,
       titulo: novaIdeia.titulo,
       descricao: novaIdeia.descricao,
+      area: novaIdeia.areaOrigem,
+      categoria: novaIdeia.categoria,
+      beneficio_esperado: novaIdeia.beneficioEsperado,
+      problema_resolvido: novaIdeia.problemaResolvido,
     });
 
     setActiveItem('minhas-ideias');
@@ -181,8 +187,8 @@ export default function App() {
       {/* Páginas do Colaborador */}
       {paginaAtual === 'desafios-abertos' && (
         <DesafiosAbertos onProporIdeia={(id) => {
-          setDesafioSelecionadoId(id);
           handleNavigate('propor-ideia');
+          setDesafioSelecionadoId(id);
         }} />
       )}
 
@@ -197,16 +203,23 @@ export default function App() {
       {/* Páginas do Gestor */}
       {paginaAtual === 'meus-desafios' && (
         <MeusDesafios
+          gestorId={user.id}
           onIrParaNovoDesafio={() => handleNavigate('novo-desafio')}
+          onEditar={(desafio) => {
+            handleNavigate('novo-desafio');
+            setDesafioEmEdicao(desafio);
+          }}
           onIrParaIdeias={(id) => {
-            setDesafioSelecionadoId(id);
             handleNavigate('ideias-relacionadas');
+            setDesafioSelecionadoId(id);
           }}
         />
       )}
 
       {paginaAtual === 'novo-desafio' && (
         <NovoDesafio
+          key={desafioEmEdicao?.id ?? 'novo'}
+          desafio={desafioEmEdicao}
           email={user.email}
           onVoltar={() =>
             handleNavigate('meus-desafios')
@@ -216,13 +229,17 @@ export default function App() {
 
       {/* Página compartilhada entre Gestor e Analista */}
       {paginaAtual === 'ideias-relacionadas' && (
-        <IdeiasRelacionadas desafioId={desafioSelecionadoId} onVoltarParaMeusDesafios={() => handleNavigate('meus-desafios')} />
+        <IdeiasRelacionadas
+          key={JSON.stringify([user.id, user.role, desafioSelecionadoId])}
+          desafioId={desafioSelecionadoId}
+          gestorId={user.role === 'gestor' ? user.id : undefined}
+        />
       )}
 
       {/* Página do Analista */}
       {paginaAtual === 'painel-avaliacao' &&
         user.role === 'analista' && (
-          <PainelAvaliacao />
+          <PainelAvaliacaoIntegrado />
         )}
 
       {paginaAtual === 'cadastrar-usuario' &&
@@ -236,11 +253,11 @@ export default function App() {
         )}
 
       {paginaAtual === 'triagem' && user.role === 'analista' && (
-        <Triagem />
+        <TriagemIntegrada />
       )}
 
       {paginaAtual === 'kanban' && user.role === 'analista' && (
-        <ProjetosKanban />
+        <KanbanIntegrado />
       )}
 
       {paginaAtual === 'mvp' && user.role === 'analista' && (

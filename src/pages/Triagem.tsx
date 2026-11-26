@@ -25,6 +25,7 @@ export interface IdeiaTriagem {
   categoria?: string;
   autor?: string;
   area?: string;
+  podeAprovar?: boolean;
 }
 
 export interface AvaliacaoTriagem {
@@ -39,6 +40,7 @@ export interface TriagemProps {
   erro?: string;
   onDecidir?: (avaliacao: AvaliacaoTriagem, decisao: DecisaoTriagem) => Promise<void> | void;
   onSolicitarApoio?: (avaliacao: AvaliacaoTriagem) => Promise<string>;
+  onAprovarIdeia?: (idMatch: string) => Promise<void>;
 }
 
 const rascunhoVazio: Omit<AvaliacaoTriagem, 'ideiaId'> = { notas: {}, justificativa: '' };
@@ -49,6 +51,7 @@ export function Triagem({
   erro = '',
   onDecidir,
   onSolicitarApoio,
+  onAprovarIdeia,
 }: TriagemProps) {
   const [ideiaSelecionadaId, setIdeiaSelecionadaId] = useState('');
   const [rascunhos, setRascunhos] = useState<Record<string, Omit<AvaliacaoTriagem, 'ideiaId'>>>({});
@@ -59,7 +62,10 @@ export function Triagem({
   const ideiaSelecionada = ideias?.find((ideia) => ideia.id === ideiaSelecionadaId) ?? ideias?.[0];
   const rascunho = ideiaSelecionada ? rascunhos[ideiaSelecionada.id] ?? rascunhoVazio : rascunhoVazio;
   const avaliacaoBloqueada = !ideiaSelecionada || carregando || Boolean(erro) || processando;
-  const pontuacao = criterios.reduce((total, criterio) => total + (rascunho.notas[criterio.id] ?? 0), 0);
+  const pontuacao = criterios.reduce((total, { id }) => {
+    const nota = rascunho.notas[id];
+    return total + (nota ? (id === 'esforco' ? 6 - nota : nota) : 0);
+  }, 0);
 
   function atualizarRascunho(ideiaId: string, dados: Partial<Omit<AvaliacaoTriagem, 'ideiaId'>>) {
     setRascunhos((anteriores) => ({
@@ -80,6 +86,10 @@ export function Triagem({
     if (!ideiaSelecionada || !onDecidir || avaliacaoBloqueada) return;
 
     const avaliacao = { ideiaId: ideiaSelecionada.id, ...rascunho };
+    if (criterios.some(({ id }) => !avaliacao.notas[id]) || avaliacao.justificativa.trim().length < 5) {
+      setErroAcao('Preencha as cinco notas e escreva um parecer com pelo menos 5 caracteres.');
+      return;
+    }
 
     setProcessando(true);
     setMensagem('');
@@ -90,6 +100,23 @@ export function Triagem({
       setMensagem('Decisão registrada com sucesso.');
     } catch (error: unknown) {
       setErroAcao(error instanceof Error ? error.message : 'Não foi possível registrar a decisão.');
+    } finally {
+      setProcessando(false);
+    }
+  }
+
+  async function aprovarIdeia() {
+    if (!ideiaSelecionada?.podeAprovar || !onAprovarIdeia || avaliacaoBloqueada) return;
+    if (!window.confirm(`Aprovar a ideia “${ideiaSelecionada.titulo}”?`)) return;
+
+    setProcessando(true);
+    setMensagem('');
+    setErroAcao('');
+    try {
+      await onAprovarIdeia(ideiaSelecionada.id);
+      setMensagem('Ideia aprovada. O projeto pode ser criado no Kanban.');
+    } catch (error) {
+      setErroAcao(error instanceof Error ? error.message : 'Não foi possível aprovar a ideia.');
     } finally {
       setProcessando(false);
     }
@@ -199,14 +226,18 @@ export function Triagem({
               value={rascunho.justificativa}
               onChange={(event) => ideiaSelecionada && atualizarRascunho(ideiaSelecionada.id, { justificativa: event.target.value })}
               disabled={avaliacaoBloqueada}
+              maxLength={5000}
               rows={5}
             />
           </section>
 
           <div className="triagem-page__acoes">
-            <button type="button" className="triagem-page__btn triagem-page__btn--secundario" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('devolver')}>Devolver ao autor</button>
-            <button type="button" className="triagem-page__btn triagem-page__btn--rejeitar" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('rejeitar')}>Rejeitar</button>
-            <button type="button" className="triagem-page__btn triagem-page__btn--primario" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('aprovar')}>Aprovar para Projeto</button>
+            <button type="button" className="triagem-page__btn triagem-page__btn--secundario" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('devolver')}>Registrar ajustes</button>
+            <button type="button" className="triagem-page__btn triagem-page__btn--rejeitar" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('rejeitar')}>Registrar triagem reprovada</button>
+            <button type="button" className="triagem-page__btn triagem-page__btn--primario" disabled={!onDecidir || avaliacaoBloqueada} onClick={() => decidir('aprovar')}>Registrar triagem aprovada</button>
+            {ideiaSelecionada?.podeAprovar && (
+              <button type="button" className="triagem-page__btn triagem-page__btn--primario" disabled={avaliacaoBloqueada} onClick={aprovarIdeia}>Aprovar ideia para projeto</button>
+            )}
           </div>
 
           {mensagem && <p className="triagem-page__estado triagem-page__sucesso" role="status">{mensagem}</p>}
